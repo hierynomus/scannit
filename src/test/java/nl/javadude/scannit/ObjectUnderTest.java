@@ -45,5 +45,26 @@ public interface ObjectUnderTest {
         public String fooBar(String baz) {
             return baz;
         }
+
+        @MethodAnnotation
+        public int foozBar(int baz) {
+            return baz;
+        }
+
+        @MethodAnnotation
+        public int[] fooArBar(int[] baz) {
+            return baz;
+        }
+
+        @MethodAnnotation
+        public String[] fooAr2Bar(String[] baz) {
+            return baz;
+        }
     }
+
+    public interface Minor {}
+    public interface Person {}
+    public class Parent implements Person {}
+    public class Child extends Parent {}
+    public class GrandChild extends Child implements Minor {}
 }

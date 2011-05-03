@@ -8,12 +8,17 @@ import static nl.javadude.scannit.filter.Filter.chain;
 import static nl.javadude.scannit.filter.Filter.include;
 
 public abstract class AbstractScanner {
+    private static final Filter INCLUDE_ALL = include(".*");
 
     // By default include everything.
-    private Filter filter = include(".*");
+    private Filter filter = INCLUDE_ALL;
 
     public void addFilter(Filter filter) {
         this.filter = chain(filter, this.filter);
+    }
+
+    public void clearFilter() {
+        this.filter = INCLUDE_ALL;
     }
 
     public boolean accepts(String name) {

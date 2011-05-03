@@ -6,7 +6,7 @@ import com.google.common.collect.MapMaker;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
-import nl.javadude.scannit.scanner.Scanner;
+import nl.javadude.scannit.scanner.AbstractScanner;
 
 import java.util.*;
 
@@ -21,7 +21,7 @@ public class Registry {
         }
     });
 
-    public Multimap<String, String> get(Scanner scanner) {
+    public Multimap<String, String> get(AbstractScanner scanner) {
         return register.get(scanner.getClass().getSimpleName());
     }
 }

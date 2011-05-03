@@ -9,8 +9,8 @@ import java.util.List;
 import static nl.javadude.scannit.metadata.DescriptorHelper.toMethodDescriptor;
 import static nl.javadude.scannit.metadata.JavassistHelper.getMethodAnnotations;
 
-public class MethodAnnotationScanner implements Scanner {
-    public void scan(ClassFile file, Registry registry) {
+public class MethodAnnotationScanner extends AbstractScanner {
+    public void doScan(ClassFile file, Registry registry) {
         List<MethodInfo> methods = file.getMethods();
         for (MethodInfo method : methods) {
             List<String> methodAnnotations = getMethodAnnotations(method);

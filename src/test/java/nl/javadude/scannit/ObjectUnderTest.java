@@ -19,9 +19,13 @@ public interface ObjectUnderTest {
 
 
     @ObjectUnderTest.ClassAnnotation
-    public class TestClass {
+    public class AnnotatedTestClass {
     }
 
+    public class TestClassWithAnnotatedField {
+        @FieldAnnotation
+        private String foo;
+    }
 
     public class TestClassWithAnnotatedMethod {
         @MethodAnnotation

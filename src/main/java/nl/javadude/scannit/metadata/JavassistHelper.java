@@ -2,6 +2,7 @@ package nl.javadude.scannit.metadata;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import com.google.common.io.Closeables;
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileInputStream;
 import javassist.bytecode.*;
@@ -11,6 +12,7 @@ import java.io.*;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.io.Closeables.closeQuietly;
 
 public class JavassistHelper {
 
@@ -32,13 +34,7 @@ public class JavassistHelper {
             in = new DataInputStream(new BufferedInputStream(is));
             return new ClassFile(in);
         } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    throw new IllegalStateException("Could not close inputstream", e);
-                }
-            }
+            closeQuietly(in);
         }
     }
 
@@ -62,12 +58,8 @@ public class JavassistHelper {
         return readAnnotations(attribute);
     }
 
-    public static String getDescription(ClassFile file, MethodInfo method) {
-        return new StringBuilder(file.getName()).append(".").append(method.getName()).append("(").append(parameters(method)).append(")").toString();
-    }
-
-    private static String parameters(MethodInfo method) {
-//        Descriptor.method.getDescriptor();
-        return null;
+    public static List<String> getFieldAnnotations(FieldInfo field) {
+        AnnotationsAttribute attribute = (AnnotationsAttribute) field.getAttribute(AnnotationsAttribute.visibleTag);
+        return readAnnotations(attribute);
     }
 }

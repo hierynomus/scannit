@@ -19,6 +19,9 @@ import java.util.Set;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 
+/**
+ * Reads the classLoader and returns URIs
+ */
 public class ClasspathReader {
 
     private Function<URL, URI> url2uri = new Function<URL, URI>() {
@@ -32,6 +35,11 @@ public class ClasspathReader {
         }
     };
 
+    /**
+     * Finds all URIs in the ContextClassLoader which contain a certain package.
+     * @param packagePrefix The (prefix) package to search for
+     * @return all matching URIs, each URI includes the package!
+     */
     public Set<URI> findURIs(String packagePrefix) {
         String filePath = packagePrefix.replaceAll("\\.", "/");
         logger.debug("Finding resources for prefix: {}", filePath);
@@ -46,14 +54,20 @@ public class ClasspathReader {
         return newHashSet(uris);
     }
 
+    /**
+     * Returns all URIs in the ContextClassLoader and any of its parent classloaders.
+     * @return
+     */
     public Set<URI> findURIs() {
         logger.debug("Finding all URIs from the classloader");
         return findURIs(Thread.currentThread().getContextClassLoader());
     }
 
     private Set<URI> findURIs(ClassLoader contextClassLoader) {
-        if (contextClassLoader.getParent() == null || !(contextClassLoader instanceof URLClassLoader))
+        if (contextClassLoader == null)
             return newHashSet();
+        else if (!(contextClassLoader instanceof URLClassLoader))
+            return findURIs(contextClassLoader.getParent());
 
         URL[] urLs = ((URLClassLoader) contextClassLoader).getURLs();
         HashSet<URI> uris = newHashSet(Lists.transform(newArrayList(Iterators.forArray(urLs)), url2uri));
@@ -61,6 +75,12 @@ public class ClasspathReader {
         return uris;
     }
 
+    /**
+     * Finds all the base URIs which contain a (prefix) package. The URIs are returned without the actual package, opposed to a call to {@link #findURIs(String)}
+     *
+     * @param prefix The package prefix to scan for.
+     * @return the base URIs
+     */
     public Set<URI> findBaseURIs(String prefix) {
         Set<URI> result = newHashSet();
 

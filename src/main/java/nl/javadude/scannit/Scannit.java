@@ -1,18 +1,35 @@
 package nl.javadude.scannit;
 
-import de.schlichtherle.truezip.file.TFile;
-import nl.javadude.scannit.reader.ClasspathReader;
+import nl.javadude.scannit.registry.Registry;
+import nl.javadude.scannit.registry.RegistryHelper;
 
-import java.net.URI;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Set;
 
 public class Scannit {
+    final Registry registry = new Registry();
+    private RegistryHelper registryHelper;
 
-    public static Scannit scan(String packagePrefix) {
-        Set<URI> baseURIs = new ClasspathReader().findBaseURIs(packagePrefix);
-        for (URI baseURI : baseURIs) {
-            TFile file = new TFile(baseURI);
-        }
-        return null;
+    public Scannit(Configuration configuration) {
+        new Worker(configuration, registry).scan();
+        registryHelper = new RegistryHelper(registry);
+    }
+
+    public Set<Class<?>> getTypesAnnotatedWith(Class<? extends Annotation> annotation) {
+        return registryHelper.getTypesAnnotatedWith(annotation, true);
+    }
+
+    public Set<Method> getMethodsAnnotatedWith(Class<? extends Annotation> annotation) {
+        return registryHelper.getMethodsAnnotatedWith(annotation);
+    }
+
+    public Set<Field> getFieldsAnnotatedWith(Class<? extends Annotation> annotation) {
+        return registryHelper.getFieldsAnnotatedWith(annotation);
+    }
+
+    public <T> Set<Class<? extends T>> getSubTypesOf(Class<T> clazz) {
+        return registryHelper.getSubTypesOf(clazz);
     }
 }

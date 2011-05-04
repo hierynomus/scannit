@@ -29,4 +29,12 @@ public class ClasspathReaderTest {
         assertThat(urIs, notNullValue());
         assertThat(urIs.size(), not(equalTo(0)));
     }
+
+    @Test
+    public void shouldFindBaseURIs() {
+        Set<URI> urIs = new ClasspathReader().findURIs("nl.javadude");
+        Set<URI> baseUris = new ClasspathReader().findBaseURIs("nl.javadude");
+        assertThat(baseUris.size(), equalTo(urIs.size()));
+        
+    }
 }

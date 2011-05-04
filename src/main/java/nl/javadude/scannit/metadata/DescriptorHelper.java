@@ -22,10 +22,21 @@ public class DescriptorHelper {
     private static List<String> primitiveDescriptors = newArrayList("Z", "B", "C", "S", "I", "J", "F", "D");
     private static List<? extends Class<?>> primitiveClasses = newArrayList(boolean.class, byte.class, char.class, short.class, int.class, long.class, float.class, double.class);
 
+    /**
+     * Convert the Javassist ClassFile to a String representation.
+     * @param file a Javassist ClassFile
+     * @return a String representing the full class name
+     */
     public static String toTypeDescriptor(ClassFile file) {
         return file.getName();
     }
 
+    /**
+     * Convert a Javassist ClassFile and MethodInfo to a String representation.
+     * @param file a Javassist ClassFile
+     * @param method a Javassist MethodInfo
+     * @return a String representing the full class name followed by the method and its signature
+     */
     public static String toMethodDescriptor(ClassFile file, MethodInfo method) {
         return new StringBuilder(toTypeDescriptor(file)).append(".").append(method.getName()).append(parameters(method)).toString();
     }
@@ -34,10 +45,21 @@ public class DescriptorHelper {
         return Descriptor.toString(method.getDescriptor());
     }
 
+    /**
+     * Convert a Javassist ClassFile and FieldInfo to a String representation.
+     * @param file a Javassist ClassFile
+     * @param field a Javassist FieldInfo
+     * @return a String representing the full class name followed by the field name.
+     */
     public static String tofieldDescriptor(ClassFile file, FieldInfo field) {
         return new StringBuilder(toTypeDescriptor(file)).append(".").append(field.getName()).toString();
     }
 
+    /**
+     * Convert a String representation of the class to a Java class
+     * @param descriptor the full class name
+     * @return a Java class
+     */
     public static Class<?> fromTypeDescriptor(String descriptor) {
         try {
             return Class.forName(descriptor, false, Thread.currentThread().getContextClassLoader());
@@ -46,6 +68,11 @@ public class DescriptorHelper {
         }
     }
 
+    /**
+     * Convert a String representation of the method to a Java Reflect Method
+     * @param methodDescriptor the full string representation of the method (including class name and parameters)
+     * @return a Java Reflect Method
+     */
     public static Method fromMethodDescriptor(String methodDescriptor) {
         int startParameterList = methodDescriptor.indexOf('(');
         int endParameterList = methodDescriptor.indexOf(')');
@@ -98,6 +125,11 @@ public class DescriptorHelper {
         return primitiveNames.contains(paramDescriptor);
     }
 
+    /**
+     * Convert a string representation of a field to a Java Reflect Field.
+     * @param fieldDescriptor a String representation of a Field (including the class name)
+     * @return a Java Reflect Field
+     */
     public static Field fromFieldDescriptor(String fieldDescriptor) {
         int lastDot = fieldDescriptor.lastIndexOf('.');
         String className = fieldDescriptor.substring(0, lastDot);

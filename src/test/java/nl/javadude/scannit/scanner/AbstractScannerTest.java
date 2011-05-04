@@ -1,6 +1,6 @@
 package nl.javadude.scannit.scanner;
 
-import nl.javadude.scannit.Registry;
+import nl.javadude.scannit.registry.Registry;
 import org.junit.Before;
 
 public abstract class AbstractScannerTest {

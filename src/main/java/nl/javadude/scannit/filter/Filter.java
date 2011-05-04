@@ -29,6 +29,9 @@ public abstract class Filter implements Predicate<String> {
         return chain;
     }
 
+    /**
+     * A Filter that returns true if it is applied to a positive match
+     */
     public static class IncludeFilter extends Filter {
         protected Pattern pattern;
 
@@ -41,6 +44,9 @@ public abstract class Filter implements Predicate<String> {
         }
     }
 
+    /**
+     * A Filter that returns true if it is applied to a negative match
+     */
     public static class ExcludeFilter extends IncludeFilter {
         protected ExcludeFilter(String regex) {
             super(regex);
@@ -52,6 +58,9 @@ public abstract class Filter implements Predicate<String> {
         }
     }
 
+    /**
+     * An 'AND' chain of filters.
+     */
     public static class FilterChain extends Filter {
         private List<Filter> filters = newArrayList();
 

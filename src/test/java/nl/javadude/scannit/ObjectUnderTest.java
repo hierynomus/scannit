@@ -1,5 +1,6 @@
 package nl.javadude.scannit;
 
+import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -8,6 +9,10 @@ public interface ObjectUnderTest {
     @Retention(RetentionPolicy.RUNTIME)
     public @interface ClassAnnotation {
     }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Inherited
+    public @interface InheritedAnnotation {}
 
     @Retention(RetentionPolicy.RUNTIME)
     public @interface MethodAnnotation {
@@ -61,6 +66,11 @@ public interface ObjectUnderTest {
             return baz;
         }
     }
+
+    @InheritedAnnotation
+    public class FooClass {}
+
+    public class BarClass extends FooClass {}
 
     public interface Minor {}
     public interface Person {}

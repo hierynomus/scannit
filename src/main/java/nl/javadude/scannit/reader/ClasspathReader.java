@@ -84,14 +84,17 @@ public class ClasspathReader {
     public Set<URI> findBaseURIs(String prefix) {
         Set<URI> result = newHashSet();
 
-        for (URI urI : findURIs(prefix)) {
-            for (URI base : findURIs()) {
-                if (urI.getPath().startsWith(base.getPath())) {
+        Set<URI> urIs = findURIs(prefix);
+        Set<URI> baseUris = findURIs();
+        for (URI urI : urIs) {
+            for (URI base : baseUris) {
+                if (urI.getSchemeSpecificPart().contains(base.getSchemeSpecificPart())) {
                     result.add(base);
                 }
             }
         }
 
+        logger.debug("Found base uris: " + result);
         return result;
     }
 

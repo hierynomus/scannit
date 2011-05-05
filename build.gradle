@@ -15,6 +15,7 @@ dependencies {
 	compile "org.slf4j:slf4j-api:1.6.1"
 	compile "com.google.guava:guava:r09"
 	compile "de.schlichtherle.truezip:truezip-file:7.0-rc2"
+	compile "de.schlichtherle.truezip:truezip-driver-zip:7.0-rc2"
 	testCompile "junit:junit:4.8.2"
 	testRuntime "ch.qos.logback:logback-classic:0.9.24"
 }

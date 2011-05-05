@@ -1,8 +1,11 @@
 package nl.javadude.scannit.reader;
 
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.junit.Test;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -35,6 +38,45 @@ public class ClasspathReaderTest {
         Set<URI> urIs = new ClasspathReader().findURIs("nl.javadude");
         Set<URI> baseUris = new ClasspathReader().findBaseURIs("nl.javadude");
         assertThat(baseUris.size(), equalTo(urIs.size()));
-        
+    }
+
+    @Test
+    public void shouldCorrectlyDeduceBaseUriForJarFiles() {
+        TestClasspathReader testClasspathReader = new TestClasspathReader("jar:file:foo/bar/baz.jar/org/apache", "file:foo/bar/baz.jar");
+        assertThat(testClasspathReader.findBaseURIs("org.apache").size(), equalTo(1));
+    }
+
+    @Test
+    public void shouldCorrectlyDeduceBaseUriForDirectories() {
+        TestClasspathReader testClasspathReader = new TestClasspathReader("file:foo/bar/baz/org/apache", "file:foo/bar/baz");
+        assertThat(testClasspathReader.findBaseURIs("org.apache").size(), equalTo(1));
+    }
+
+    private static class TestClasspathReader extends ClasspathReader {
+        private String uri;
+        private String baseUri;
+
+        private TestClasspathReader(String uri, String baseUri) {
+            this.uri = uri;
+            this.baseUri = baseUri;
+        }
+
+        @Override
+        public Set<URI> findURIs(String packagePrefix) {
+            try {
+                return Sets.newHashSet(new URI(uri));
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        @Override
+        public Set<URI> findURIs() {
+            try {
+                return Sets.newHashSet(new URI(baseUri));
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }

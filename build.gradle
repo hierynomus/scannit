@@ -1,3 +1,17 @@
+buildscript {
+  repositories {
+    ivy {
+      name = "GitHub"
+      artifactPattern 'http://cloud.github.com/hierynomus/gradle-plugins/downloads/[module]-[revision].[ext]'
+    }
+  }
+
+  dependencies {
+    classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.3'
+  }
+}
+
+apply plugin: 'license'
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'maven'
@@ -19,3 +33,15 @@ dependencies {
 	testCompile "junit:junit:4.8.2"
 	testRuntime "ch.qos.logback:logback-classic:0.9.24"
 }
+
+task sourcesJar(type: Jar) {
+	from sourceSets.main.allSource
+	classifier = 'sources'
+}
+
+artifacts {
+	archives sourcesJar
+}
+
+license = new File(project.projectDir, 'LICENSE_HEADER')
+

@@ -50,22 +50,21 @@ public class URIReader {
             // Detect based on the scheme by passing in the uri.
             tFile = new TFile(uri);
         }
-        return listDirectory(tFile);
+        List<TFile> files = newArrayList();
+        list(tFile, files);
+        return files;
     }
 
-    private List<TFile> listDirectory(TFile tFile) {
-        logger.debug("Listing directory/archive of file: {}", tFile);
-        List<TFile> files = newArrayList();
-        for (TFile file : tFile.listFiles()) {
-            if (file.isArchive() || file.isDirectory()) {
-                files.addAll(listDirectory(file));
-            } else if (file.isEntry() || file.isFile()) {
-                logger.debug("Found file/entry {}", file);
-                files.add(file);
+    private void list(TFile tFile, List<TFile> files) {
+        if (tFile.isFile() || tFile.isEntry()) {
+            logger.debug("Found file/entry {}", tFile);
+            files.add(tFile);
+        } else if (tFile.isArchive() || tFile.isDirectory()) {
+            logger.debug("Listing directory/archive of file: {}", tFile);
+            for (TFile file : tFile.listFiles()) {
+                list(file, files);
             }
         }
-
-        return files;
     }
 
     private static final Logger logger = LoggerFactory.getLogger(URIReader.class);

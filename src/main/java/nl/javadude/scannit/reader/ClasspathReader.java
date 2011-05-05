@@ -66,7 +66,7 @@ public class ClasspathReader {
             Enumeration<URL> resources = contextClassLoader.getResources(filePath);
             uris = Lists.transform(Lists.newArrayList(Iterators.forEnumeration(resources)), url2uri);
         } catch (IOException e) {
-            throw new IllegalStateException("ask Jeroen", e);
+            throw new IllegalStateException("Could not fetch the resources matching " + filePath + " from the context classloader.", e);
         }
         return newHashSet(uris);
     }
@@ -111,7 +111,7 @@ public class ClasspathReader {
             }
         }
 
-        logger.debug("Found base uris: " + result);
+        logger.debug("Found base uris: {}", result);
         return result;
     }
 

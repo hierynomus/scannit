@@ -56,7 +56,7 @@ public class URIReader {
     }
 
     private void list(TFile tFile, List<TFile> files) {
-        if (tFile.isArchive() || tFile.isDirectory()) {
+        if ((tFile.isArchive() || tFile.isDirectory()) && tFile.listFiles() != null) {
             logger.debug("Listing directory/archive of file: {}", tFile);
             for (TFile file : tFile.listFiles()) {
                 list(file, files);

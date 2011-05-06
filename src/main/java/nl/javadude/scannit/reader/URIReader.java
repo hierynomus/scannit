@@ -56,14 +56,14 @@ public class URIReader {
     }
 
     private void list(TFile tFile, List<TFile> files) {
-        if (tFile.isFile() || tFile.isEntry()) {
-            logger.debug("Found file/entry {}", tFile);
-            files.add(tFile);
-        } else if (tFile.isArchive() || tFile.isDirectory()) {
+        if (tFile.isArchive() || tFile.isDirectory()) {
             logger.debug("Listing directory/archive of file: {}", tFile);
             for (TFile file : tFile.listFiles()) {
                 list(file, files);
             }
+        } else if (tFile.isFile() || tFile.isEntry()) {
+            logger.debug("Found file/entry {}", tFile);
+            files.add(tFile);
         }
     }
 

@@ -17,6 +17,7 @@
 
 package nl.javadude.scannit;
 
+import nl.javadude.excluded.AnotherObjectNotTested;
 import nl.javadude.scannit.filter.Filter;
 import nl.javadude.scannit.scanner.SubTypeScanner;
 import nl.javadude.scannit.scanner.TypeAnnotationScanner;
@@ -26,6 +27,7 @@ import org.junit.Test;
 
 import java.util.Set;
 
+import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.matchers.JUnitMatchers.hasItem;
 
@@ -36,10 +38,7 @@ public class ScannitTest {
     @Before
     public void init() {
         SubTypeScanner subTypeScanner = new SubTypeScanner();
-        Filter include = Filter.include("nl\\.javadude\\.scannit.*");
-        subTypeScanner.addFilter(include);
         TypeAnnotationScanner typeAnnotationScanner = new TypeAnnotationScanner();
-        typeAnnotationScanner.addFilter(include);
         Configuration config = Configuration.config().with(subTypeScanner, typeAnnotationScanner).scan("nl.javadude.scannit");
         scannit = new Scannit(config);
     }
@@ -58,6 +57,10 @@ public class ScannitTest {
         assertThat((Iterable<Class<ObjectUnderTest.BarClass>>) typesAnnotatedWith, hasItem(ObjectUnderTest.BarClass.class));
     }
 
-
+    @Test
+    public void shouldNotHaveFoundClassOutsideScannedPrefixes() {
+        Set typesAnnotatedWith = scannit.getTypesAnnotatedWith(ObjectUnderTest.ClassAnnotation.class);
+        assertThat((Iterable<Class<AnotherObjectNotTested.AnnotatedNotTestClass>>) typesAnnotatedWith, not(hasItem(AnotherObjectNotTested.AnnotatedNotTestClass.class)));
+    }
 }
 

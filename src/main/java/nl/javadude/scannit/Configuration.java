@@ -17,6 +17,7 @@
 
 package nl.javadude.scannit;
 
+import nl.javadude.scannit.filter.Filter;
 import nl.javadude.scannit.scanner.AbstractScanner;
 
 import java.util.Arrays;
@@ -51,7 +52,12 @@ public class Configuration {
      * @return this
      */
     public Configuration with(AbstractScanner... scanners) {
-        this.scanners.addAll(Arrays.asList(scanners));
+        for (AbstractScanner scanner : scanners) {
+            for (String prefix : prefixes) {
+                scanner.addFilter(toFilter(prefix));
+            }
+            this.scanners.add(scanner);
+        }
         return this;
     }
 
@@ -62,7 +68,14 @@ public class Configuration {
      */
     public Configuration scan(String prefix) {
         prefixes.add(prefix);
+        for (AbstractScanner scanner : scanners) {
+            scanner.addFilter(toFilter(prefix));
+        }
         return this;
+    }
+
+    private Filter toFilter(String prefix) {
+        return Filter.include(prefix.replace(".", "\\.") + ".*");
     }
 }
 

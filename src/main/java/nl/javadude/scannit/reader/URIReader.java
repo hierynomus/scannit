@@ -51,18 +51,28 @@ public class URIReader {
             tFile = new TFile(uri);
         }
         List<TFile> files = newArrayList();
-        list(tFile, files);
+
+        if (tFile.isArchive()) {
+            list(tFile, files, true);
+        } else {
+            list(tFile, files, false);
+        }
+
         return files;
     }
 
-    private void list(TFile tFile, List<TFile> files) {
-        if ((tFile.isArchive() || tFile.isDirectory()) && tFile.listFiles() != null) {
-            logger.debug("Listing directory/archive of file: {}", tFile);
+    private void list(TFile tFile, List<TFile> files, boolean scanInArchives) {
+        boolean isArchive = tFile.isArchive();
+        boolean isNormalDir = tFile.isDirectory() && !isArchive;
+        boolean hasFiles = tFile.listFiles() != null;
+
+        if ((isNormalDir && hasFiles) || isArchive && scanInArchives && hasFiles) {
+            logger.trace("Listing directory/archive of file: {}", tFile);
             for (TFile file : tFile.listFiles()) {
-                list(file, files);
+                list(file, files, false);
             }
         } else if (tFile.isFile() || tFile.isEntry()) {
-            logger.debug("Found file/entry {}", tFile);
+            logger.trace("Found file/entry {}", tFile);
             files.add(tFile);
         }
     }

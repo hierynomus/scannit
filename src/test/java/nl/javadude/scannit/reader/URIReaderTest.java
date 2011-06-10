@@ -33,6 +33,7 @@ import static com.google.common.collect.Lists.transform;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.matchers.JUnitMatchers.hasItem;
 
@@ -63,5 +64,20 @@ public class URIReaderTest {
                 return input.getPath();
             }
         }), hasItem(endsWith("Empty.java")));
+    }
+
+    @Test
+    public void shouldNotScanNonTopLevelArchives() throws URISyntaxException {
+        URL resource = Thread.currentThread().getContextClassLoader().getResource("folder");
+        assertThat(resource, notNullValue());
+        List<TFile> tFiles = uriReader.listFiles(resource.toURI());
+        List<String> paths = transform(tFiles, new Function<TFile, String>() {
+            public String apply(TFile input) {
+                return input.getPath();
+            }
+        });
+        assertThat(paths, not(hasItem(endsWith("Empty.java"))));
+        assertThat(paths, hasItem(endsWith("foo.properties")));
+        assertThat(tFiles.size(), is(1));
     }
 }

@@ -2,7 +2,7 @@ buildscript {
   repositories {
     ivy {
       name = "GitHub"
-      artifactPattern 'http://cloud.github.com/hierynomus/gradle-plugins/downloads/[module]-[revision].[ext]'
+      artifactPattern 'http://cloud.github.com/downloads/hierynomus/gradle-plugins/[module]-[revision].[ext]'
     }
   }
 

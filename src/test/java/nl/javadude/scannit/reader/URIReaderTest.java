@@ -20,6 +20,7 @@ package nl.javadude.scannit.reader;
 import com.google.common.base.Function;
 import de.schlichtherle.truezip.file.TFile;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -65,6 +66,28 @@ public class URIReaderTest {
             }
         }), hasItem(endsWith("Empty.java")));
     }
+
+	@Test
+	public void shouldScanInJarFileAsUriScheme() throws IOException, URISyntaxException {
+	    URL resource = Thread.currentThread().getContextClassLoader().getResource("empty.jar");
+		// Convert it to a jar:file:...!/ URI (this normally happens in ClasspathReader)
+		String file = "jar:file:" + resource.getFile() + "!/";
+	    assertThat(resource, notNullValue());
+	    List<TFile> tFiles = uriReader.listFiles(new URI(file));
+	    assertThat(tFiles.size(), is(2));
+	}
+
+	@Ignore("Can be fixed when http://java.net/jira/browse/TRUEZIP-154 is fixed")
+	@Test
+	// Note: This happens with for example Gradle 1.0-milstone-4, which generates cached artifacts with random names on the classpath
+	public void shouldScanInJarFileWithoutDot() throws Exception {
+		URL resource = Thread.currentThread().getContextClassLoader().getResource("emptyjarwithoutdot");
+		// Convert it to a jar:file:...!/ URI (this normally happens in ClasspathReader)
+		String file = "jar:file:" + resource.getFile() + "!/";
+		assertThat(resource, notNullValue());
+		List<TFile> tFiles = uriReader.listFiles(new URI(file));
+		assertThat(tFiles.size(), is(2));
+	}
 
     @Test
     public void shouldNotScanNonTopLevelArchives() throws URISyntaxException {

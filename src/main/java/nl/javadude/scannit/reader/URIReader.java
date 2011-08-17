@@ -17,19 +17,32 @@
 
 package nl.javadude.scannit.reader;
 
+import de.schlichtherle.truezip.file.TArchiveDetector;
+import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileInputStream;
+import de.schlichtherle.truezip.fs.FsDriver;
+import de.schlichtherle.truezip.fs.FsScheme;
+import de.schlichtherle.truezip.fs.archive.zip.JarDriver;
+import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
+import de.schlichtherle.truezip.socket.sl.IOPoolLocator;
 import javassist.bytecode.ClassFile;
 import nl.javadude.scannit.Configuration;
 import nl.javadude.scannit.metadata.JavassistHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.management.RuntimeErrorException;
 import java.io.FileNotFoundException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
+import java.util.ServiceConfigurationError;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Maps.newHashMap;
+import static com.google.common.collect.Sets.newHashSet;
 
 /**
  * Read an URI into a File list, using TrueZip to scan through package.
@@ -43,38 +56,44 @@ public class URIReader {
      */
     public List<TFile> listFiles(URI uri) {
         TFile tFile = null;
-        if (uri.getPath() != null) {
-            // if the URI has a path, this means it is a real file, use the detection of the path, and not look at the scheme
-            tFile = new TFile(uri.getPath());
-        } else {
-            // Detect based on the scheme by passing in the uri.
-            tFile = new TFile(uri);
-        }
-        List<TFile> files = newArrayList();
+		if (uri.getPath() != null) {
+			// if the URI has a path, this means it is a real file, use the detection of the path, and not look at the scheme
+			tFile = new TFile(uri.getPath());
+		} else {
+			tFile = new TFile(uri);
+		}
+		List<TFile> files = newArrayList();
 
-        if (tFile.isArchive()) {
-            list(tFile, files, true);
-        } else {
-            list(tFile, files, false);
-        }
-
-        return files;
+		if (tFile.isArchive()) {
+			list(tFile, files, true);
+		} else {
+			list(tFile, files, false);
+		}
+		return files;
     }
 
     private void list(TFile tFile, List<TFile> files, boolean scanInArchives) {
-        boolean isArchive = tFile.isArchive();
-        boolean isNormalDir = tFile.isDirectory() && !isArchive;
-        boolean hasFiles = (isArchive || isNormalDir) && tFile.listFiles() != null;
+	    try {
+			boolean isArchive = tFile.isArchive();
+			boolean isNormalDir = !isArchive && tFile.isDirectory();
+			boolean hasFiles = (isArchive || isNormalDir) && tFile.listFiles() != null;
 
-        if ((isNormalDir && hasFiles) || isArchive && scanInArchives && hasFiles) {
-            logger.trace("Listing directory/archive of file: {}", tFile);
-            for (TFile file : tFile.listFiles()) {
-                list(file, files, false);
-            }
-        } else if (tFile.isFile() || tFile.isEntry()) {
-            logger.trace("Found file/entry {}", tFile);
-            files.add(tFile);
-        }
+			if ((isNormalDir && hasFiles) || isArchive && scanInArchives && hasFiles) {
+				logger.trace("Listing directory/archive of file: {}", tFile);
+				for (TFile file : tFile.listFiles()) {
+					list(file, files, false);
+				}
+			} else if (tFile.isFile() || tFile.isEntry()) {
+				logger.trace("Found file/entry {}", tFile);
+				files.add(tFile);
+			}
+	    } catch (RuntimeException re) {
+		    logger.error("Error scanning {}, continuing...", tFile);
+		    logger.debug("Exception was: ", re);
+	    } catch (ServiceConfigurationError re) {
+		    logger.error("Error scanning {}, continuing...", tFile);
+		    logger.debug("Error was: ", re);
+	    }
     }
 
     private static final Logger logger = LoggerFactory.getLogger(URIReader.class);

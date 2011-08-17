@@ -1,17 +1,17 @@
-buildscript {
-  repositories {
-    ivy {
-      name = "GitHub"
-      artifactPattern 'http://cloud.github.com/downloads/hierynomus/gradle-plugins/[module]-[revision].[ext]'
-    }
-  }
-
-  dependencies {
-    classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.3'
-  }
-}
-
-apply plugin: 'license'
+//buildscript {
+//  repositories {
+//    ivy {
+//      name = "GitHub"
+//      artifactPattern 'http://cloud.github.com/downloads/hierynomus/gradle-plugins/[module]-[revision].[ext]'
+//    }
+//  }
+//
+//  dependencies {
+//    classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.3'
+//  }
+//}
+//
+//apply plugin: 'license'
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'maven'

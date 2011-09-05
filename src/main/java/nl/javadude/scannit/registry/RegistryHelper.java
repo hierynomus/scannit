@@ -35,8 +35,6 @@ import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Sets.newHashSet;
 
 public class RegistryHelper {
-
-
     private Registry registry;
 
     public RegistryHelper(Registry registry) {

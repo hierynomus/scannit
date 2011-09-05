@@ -18,18 +18,18 @@
 package nl.javadude.scannit.reader;
 
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import de.schlichtherle.truezip.file.TFile;
-import org.junit.Before;
-import org.junit.Ignore;
+import de.schlichtherle.truezip.fs.FsSyncException;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Enumeration;
 import java.util.List;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Lists.transform;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -38,33 +38,30 @@ import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
 import static org.junit.matchers.JUnitMatchers.hasItem;
 
-public class URIReaderTest {
-
-    private URIReader uriReader;
-
-    @Before
-    public void init() {
-        uriReader = new URIReader();
-    }
+public class ArchiveEntrySupplierTest {
 
     @Test
     public void shouldReturnEmptyListWhenPassedAFileInsteadOfADirectoryUri() throws URISyntaxException {
-        URL urlToThisClassFile = Thread.currentThread().getContextClassLoader().getResource("nl/javadude/scannit/reader/URIReaderTest.class");
-        List<TFile> tFiles = uriReader.listFiles(urlToThisClassFile.toURI());
-        assertThat(tFiles.size(), is(1));
+        URL urlToThisClassFile = Thread.currentThread().getContextClassLoader().getResource("nl/javadude/scannit/reader/ArchiveEntrySupplierTest.class");
+	    TestArchiveEntrySupplier archiveEntrySupplier = new TestArchiveEntrySupplier(urlToThisClassFile.toURI());
+	    List<TFile> tFiles = archiveEntrySupplier.getTFiles();
+	    assertThat(tFiles.size(), is(1));
+	    archiveEntrySupplier.doCloseForTest();
     }
 
     @Test
     public void shouldScanInJarFile() throws IOException, URISyntaxException {
         URL resource = Thread.currentThread().getContextClassLoader().getResource("empty.jar");
         assertThat(resource, notNullValue());
-        List<TFile> tFiles = uriReader.listFiles(resource.toURI());
+	    TestArchiveEntrySupplier archiveEntrySupplier = new TestArchiveEntrySupplier(resource.toURI());
+	    List<TFile> tFiles = archiveEntrySupplier.getTFiles();
         assertThat(tFiles.size(), is(2));
         assertThat(transform(tFiles, new Function<TFile, String>() {
             public String apply(TFile input) {
                 return input.getPath();
             }
         }), hasItem(endsWith("Empty.java")));
+	    archiveEntrySupplier.doCloseForTest();
     }
 
 	@Test
@@ -73,27 +70,31 @@ public class URIReaderTest {
 		// Convert it to a jar:file:...!/ URI (this normally happens in ClasspathReader)
 		String file = "jar:file:" + resource.getFile() + "!/";
 	    assertThat(resource, notNullValue());
-	    List<TFile> tFiles = uriReader.listFiles(new URI(file));
+		TestArchiveEntrySupplier archiveEntrySupplier = new TestArchiveEntrySupplier(new URI(file));
+		List<TFile> tFiles = archiveEntrySupplier.getTFiles();
 	    assertThat(tFiles.size(), is(2));
+		archiveEntrySupplier.doCloseForTest();
 	}
 
-	@Ignore("Can be fixed when http://java.net/jira/browse/TRUEZIP-154 is fixed")
 	@Test
 	// Note: This happens with for example Gradle 1.0-milstone-4, which generates cached artifacts with random names on the classpath
 	public void shouldScanInJarFileWithoutDot() throws Exception {
 		URL resource = Thread.currentThread().getContextClassLoader().getResource("emptyjarwithoutdot");
 		// Convert it to a jar:file:...!/ URI (this normally happens in ClasspathReader)
 		String file = "jar:file:" + resource.getFile() + "!/";
-		assertThat(resource, notNullValue());
-		List<TFile> tFiles = uriReader.listFiles(new URI(file));
+	    assertThat(resource, notNullValue());
+		TestArchiveEntrySupplier archiveEntrySupplier = new TestArchiveEntrySupplier(new URI(file));
+		List<TFile> tFiles = archiveEntrySupplier.getTFiles();
 		assertThat(tFiles.size(), is(2));
+		archiveEntrySupplier.doCloseForTest();
 	}
 
     @Test
     public void shouldNotScanNonTopLevelArchives() throws URISyntaxException {
         URL resource = Thread.currentThread().getContextClassLoader().getResource("folder");
         assertThat(resource, notNullValue());
-        List<TFile> tFiles = uriReader.listFiles(resource.toURI());
+	    TestArchiveEntrySupplier archiveEntrySupplier = new TestArchiveEntrySupplier(resource.toURI());
+	    List<TFile> tFiles = archiveEntrySupplier.getTFiles();
         List<String> paths = transform(tFiles, new Function<TFile, String>() {
             public String apply(TFile input) {
                 return input.getPath();
@@ -102,5 +103,34 @@ public class URIReaderTest {
         assertThat(paths, not(hasItem(endsWith("Empty.java"))));
         assertThat(paths, hasItem(endsWith("foo.properties")));
         assertThat(tFiles.size(), is(1));
+	    archiveEntrySupplier.doCloseForTest();
     }
+
+	static class TestArchiveEntrySupplier extends ArchiveEntrySupplier {
+		private TFile tFile;
+
+		public TestArchiveEntrySupplier(URI uri) {
+			super(uri);
+		}
+
+		@Override
+		protected void closeTFile(TFile tFile) {
+			this.tFile = tFile;
+		}
+
+		List<TFile> getTFiles() {
+			final List<TFile> files = newArrayList();
+			super.withArchiveEntries(new Predicate<TFile>() {
+				public boolean apply(TFile input) {
+					files.add(input);
+					return true;
+				}
+			});
+			return files;
+		}
+
+		void doCloseForTest() {
+			super.closeTFile(tFile);
+		}
+	}
 }

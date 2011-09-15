@@ -17,10 +17,12 @@
 
 package nl.javadude.scannit.scanner;
 
+import com.google.common.base.Predicates;
 import javassist.bytecode.ClassFile;
 import nl.javadude.scannit.registry.Registry;
-import nl.javadude.scannit.filter.Filter;
 
+import static com.google.common.base.Predicates.equalTo;
+import static com.google.common.base.Predicates.not;
 import static nl.javadude.scannit.metadata.DescriptorHelper.toTypeDescriptor;
 
 /**
@@ -33,7 +35,7 @@ public class SubTypeScanner extends AbstractScanner {
      * Excludes the java.lang.Object class from the supertypes list (as everything is an object).
      */
     public SubTypeScanner() {
-        addFilter(Filter.exclude(Object.class.getName()));
+        addFilter(Predicates.<CharSequence>not(Predicates.<CharSequence>equalTo(Object.class.getName())));
     }
 
     /**

@@ -17,11 +17,16 @@
 
 package nl.javadude.scannit;
 
-import nl.javadude.scannit.filter.Filter;
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import nl.javadude.scannit.scanner.AbstractScanner;
 
+import java.util.Collection;
 import java.util.Set;
 
+import static com.google.common.base.Predicates.or;
+import static com.google.common.collect.Collections2.transform;
 import static com.google.common.collect.Sets.newHashSet;
 
 /**
@@ -52,9 +57,6 @@ public class Configuration {
      */
     public Configuration with(AbstractScanner... scanners) {
         for (AbstractScanner scanner : scanners) {
-            for (String prefix : prefixes) {
-                scanner.addFilter(toFilter(prefix));
-            }
             this.scanners.add(scanner);
         }
         return this;
@@ -67,14 +69,28 @@ public class Configuration {
      */
     public Configuration scan(String prefix) {
         prefixes.add(prefix);
-        for (AbstractScanner scanner : scanners) {
-            scanner.addFilter(toFilter(prefix));
-        }
         return this;
     }
 
-    private Filter toFilter(String prefix) {
-        return Filter.include(prefix.replace(".", "\\.") + ".*");
+	/**
+	 * wireScanners should only be called from Scannit, and only once.
+	 * It creates the filter expression for the scanners based on which they decide which classes to include.
+	 */
+	void wireScanners() {
+		Collection<Predicate<CharSequence>> predicates = transform(prefixes, new Function<String, Predicate<CharSequence>>() {
+			public Predicate<CharSequence> apply(String input) {
+				return toFilter(input);
+			}
+		});
+		Predicate<CharSequence> or = or(predicates);
+
+		for (AbstractScanner scanner : scanners) {
+			scanner.addFilter(or);
+		}
+	}
+
+    private Predicate<CharSequence> toFilter(String prefix) {
+        return Predicates.containsPattern(prefix.replace(".", "\\.") + ".*");
     }
 }
 

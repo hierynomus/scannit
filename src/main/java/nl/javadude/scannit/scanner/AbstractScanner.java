@@ -17,28 +17,28 @@
 
 package nl.javadude.scannit.scanner;
 
+import com.google.common.base.Predicate;
 import javassist.bytecode.ClassFile;
 import nl.javadude.scannit.registry.Registry;
-import nl.javadude.scannit.filter.Filter;
 
-import static nl.javadude.scannit.filter.Filter.chain;
-import static nl.javadude.scannit.filter.Filter.include;
+import static com.google.common.base.Predicates.alwaysTrue;
+import static com.google.common.base.Predicates.and;
 
 /**
  * An abstract scanner implementation which does filtering of the inputs.
  */
 public abstract class AbstractScanner {
-    private static final Filter INCLUDE_ALL = include(".*");
+    private static final Predicate<String> INCLUDE_ALL = alwaysTrue();
 
     // By default include everything.
-    private Filter filter = INCLUDE_ALL;
+    private Predicate<String> filter = INCLUDE_ALL;
 
     /**
      * Chain a new Filter to the curent one.
      * @param filter
      */
-    public void addFilter(Filter filter) {
-        this.filter = chain(filter, this.filter);
+    public void addFilter(Predicate<CharSequence> filter) {
+        this.filter = and(filter, this.filter);
     }
 
     /**

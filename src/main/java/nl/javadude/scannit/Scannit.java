@@ -30,6 +30,7 @@ public class Scannit {
     private RegistryHelper registryHelper;
 
     public Scannit(Configuration configuration) {
+	    configuration.wireScanners();
         new Worker(configuration, registry).scan();
         registryHelper = new RegistryHelper(registry);
     }

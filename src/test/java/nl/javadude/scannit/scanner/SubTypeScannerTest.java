@@ -25,6 +25,7 @@ import org.junit.Test;
 import java.io.IOException;
 
 import static nl.javadude.scannit.TestUtils.readClass;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.matchers.JUnitMatchers.hasItem;
 
@@ -51,5 +52,13 @@ public class SubTypeScannerTest extends AbstractScannerTest {
         scanner.scan(classFile, registry);
         assertThat(registry.get(scanner).get(ObjectUnderTest.Person.class.getName()), hasItem(aClass.getName()));
     }
+
+	@Test
+	public void shouldNotScanSubtypesOfObjectClass() throws IOException {
+		Class<Object> objClass = Object.class;
+		ClassFile classFile = readClass(objClass);
+		scanner.scan(classFile, registry);
+		assertThat(registry.get(scanner).isEmpty(), equalTo(true));
+	}
 }
 

@@ -20,7 +20,6 @@ package nl.javadude.scannit;
 import nl.javadude.scannit.filter.Filter;
 import nl.javadude.scannit.scanner.AbstractScanner;
 
-import java.util.Arrays;
 import java.util.Set;
 
 import static com.google.common.collect.Sets.newHashSet;

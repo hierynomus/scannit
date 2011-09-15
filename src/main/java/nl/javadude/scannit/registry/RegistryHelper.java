@@ -19,7 +19,6 @@ package nl.javadude.scannit.registry;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
-import nl.javadude.scannit.metadata.DescriptorHelper;
 import nl.javadude.scannit.scanner.*;
 
 import java.lang.annotation.Annotation;
@@ -33,6 +32,7 @@ import java.util.Set;
 import static com.google.common.collect.ImmutableSet.copyOf;
 import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Sets.newHashSet;
+import static nl.javadude.scannit.metadata.DescriptorHelper.*;
 
 public class RegistryHelper {
     private Registry registry;
@@ -54,7 +54,8 @@ public class RegistryHelper {
     private <T> ImmutableSet<Class<? extends T>> convertToClassSet(Set<String> strings) {
         return copyOf(transform(strings, new Function<String, Class<? extends T>>() {
             public Class<? extends T> apply(String input) {
-                return (Class<? extends T>) DescriptorHelper.fromTypeDescriptor(input);
+	            //noinspection unchecked
+	            return (Class<? extends T>) fromTypeDescriptor(input);
             }
         }));
     }
@@ -81,7 +82,7 @@ public class RegistryHelper {
     public Set<Method> getMethodsAnnotatedWith(Class<? extends Annotation> annotation) {
         return getAnnotatedThings(annotation, MethodAnnotationScanner.class, new Function<String, Method>() {
             public Method apply(String input) {
-                return DescriptorHelper.fromMethodDescriptor(input);
+                return fromMethodDescriptor(input);
             }
         });
     }
@@ -89,7 +90,7 @@ public class RegistryHelper {
     public Set<Field> getFieldsAnnotatedWith(Class<? extends Annotation> annotation) {
         return getAnnotatedThings(annotation, FieldAnnotationScanner.class, new Function<String, Field>() {
             public Field apply(String input) {
-                return DescriptorHelper.fromFieldDescriptor(input);
+                return fromFieldDescriptor(input);
             }
         });
     }

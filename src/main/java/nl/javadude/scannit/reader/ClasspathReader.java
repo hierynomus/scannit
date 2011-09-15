@@ -61,7 +61,7 @@ public class ClasspathReader {
         String filePath = packagePrefixToPath(packagePrefix);
         logger.debug("Finding resources for prefix: {}", filePath);
         ClassLoader contextClassLoader = getClassLoader();
-        List<URI> uris = newArrayList();
+        List<URI> uris;
         try {
             Enumeration<URL> resources = contextClassLoader.getResources(filePath);
             uris = Lists.transform(Lists.newArrayList(Iterators.forEnumeration(resources)), url2uri);

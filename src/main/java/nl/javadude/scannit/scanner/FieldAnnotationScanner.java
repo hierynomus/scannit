@@ -37,7 +37,7 @@ public class FieldAnnotationScanner extends AbstractScanner {
      * @param registry The registry to store the scanned information in.
      */
     public void doScan(ClassFile file, Registry registry) {
-        List<FieldInfo> fields = file.getFields();
+        @SuppressWarnings({"unchecked"}) List<FieldInfo> fields = file.getFields();
         for (FieldInfo field : fields) {
             List<String> fieldAnnotations = getFieldAnnotations(field);
             registerAnnotations(fieldAnnotations, file, field, registry);

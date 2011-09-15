@@ -36,7 +36,7 @@ public class MethodAnnotationScanner extends AbstractScanner {
      * @param registry The registry to store the scanned information in.
      */
     public void doScan(ClassFile file, Registry registry) {
-        List<MethodInfo> methods = file.getMethods();
+        @SuppressWarnings({"unchecked"}) List<MethodInfo> methods = file.getMethods();
         for (MethodInfo method : methods) {
             List<String> methodAnnotations = getMethodAnnotations(method);
             registerAnnotations(methodAnnotations, file, method, registry);

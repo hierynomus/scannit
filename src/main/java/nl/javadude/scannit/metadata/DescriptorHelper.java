@@ -27,7 +27,6 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.google.common.collect.Lists.charactersOf;
 import static com.google.common.collect.Lists.newArrayList;
 
 /**
@@ -37,6 +36,7 @@ public class DescriptorHelper {
 
     private static List<String> primitiveNames = newArrayList("boolean", "byte", "char", "short", "int", "long", "float", "double");
     private static List<String> primitiveDescriptors = newArrayList("Z", "B", "C", "S", "I", "J", "F", "D");
+    @SuppressWarnings({"unchecked"})
     private static List<? extends Class<?>> primitiveClasses = newArrayList(boolean.class, byte.class, char.class, short.class, int.class, long.class, float.class, double.class);
 
     /**

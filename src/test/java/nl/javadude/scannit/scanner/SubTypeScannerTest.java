@@ -19,7 +19,6 @@ package nl.javadude.scannit.scanner;
 
 import javassist.bytecode.ClassFile;
 import nl.javadude.scannit.ObjectUnderTest;
-import nl.javadude.scannit.TestUtils;
 import org.junit.Test;
 
 import java.io.IOException;

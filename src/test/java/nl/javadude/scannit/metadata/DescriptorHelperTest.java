@@ -23,7 +23,6 @@ import javassist.bytecode.ClassFile;
 import javassist.bytecode.FieldInfo;
 import javassist.bytecode.MethodInfo;
 import nl.javadude.scannit.ObjectUnderTest;
-import nl.javadude.scannit.TestUtils;
 import org.junit.Before;
 import org.junit.Test;
 

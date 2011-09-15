@@ -18,10 +18,8 @@
 package nl.javadude.scannit;
 
 import nl.javadude.excluded.AnotherObjectNotTested;
-import nl.javadude.scannit.filter.Filter;
 import nl.javadude.scannit.scanner.SubTypeScanner;
 import nl.javadude.scannit.scanner.TypeAnnotationScanner;
-import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
 

@@ -20,7 +20,6 @@ package nl.javadude.scannit.reader;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import de.schlichtherle.truezip.file.TFile;
-import de.schlichtherle.truezip.fs.FsSyncException;
 import org.junit.Test;
 
 import java.io.IOException;

@@ -17,7 +17,6 @@
 
 package nl.javadude.scannit.reader;
 
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;

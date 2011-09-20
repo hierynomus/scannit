@@ -1,6 +1,20 @@
+import org.gradle.plugin.pgp.signing.*
+
+buildscript {
+	repositories {
+		mavenLocal()
+		mavenCentral()
+		mavenRepo name: "Gradle", urls: "http://repo.gradle.org/gradle/plugins-snapshots/"
+	}
+	dependencies {
+		classpath "org.gradle.plugins:gradle-signing-plugin:0.0.1-SNAPSHOT"
+	}
+}
+
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'maven'
+apply plugin: 'signing'
 
 group = 'nl.javadude.scannit'
 version = '0.13-SNAPSHOT'
@@ -12,6 +26,11 @@ repositories {
 
 trueZipVersion="7.3.1"
 
+configurations {
+	deployerJars
+	published.extendsFrom archives, signatures
+}
+
 dependencies {
 	compile "javassist:javassist:3.8.0.GA"
 	compile "org.slf4j:slf4j-api:1.6.1"
@@ -22,6 +41,7 @@ dependencies {
 	testCompile "junit:junit:4.8.2"
 	testCompile "org.hamcrest:hamcrest-all:1.1"
 	testRuntime "ch.qos.logback:logback-classic:0.9.24"
+	deployerJars "org.apache.maven.wagon:wagon-http-lightweight:1.0-beta-6"
 }
 
 task sourcesJar(type: Jar) {
@@ -29,9 +49,83 @@ task sourcesJar(type: Jar) {
 	classifier = 'sources'
 }
 
-artifacts {
-	archives sourcesJar
+task javadocJar(type: Jar, dependsOn: javadoc) {
+	classifier = "javadoc"
+	from javadoc.destinationDir
 }
 
-license = new File(project.projectDir, 'LICENSE_HEADER')
+artifacts {
+	archives sourcesJar, javadocJar
+}
+
+signing {
+	sign configurations.archives
+}
+
+project.poms = [project.install.repositories.mavenInstaller.pom]
+uploadPublished {
+	project.deployer = repositories.mavenDeployer {
+		beforeDeployment { MavenDeployment deployment ->
+			if (signing.signatory) {
+				def signedPomArtifact = sign(deployment.pomArtifact).singleArtifact
+				// Have to alter the '?type'? of the artifact to match what is published
+				// See http://issues.gradle.org/browse/GRADLE-1589
+				signedPomArtifact.type = "pom." + signing.type.extension
+				deployment.addArtifact(signedPomArtifact)
+			}
+		}
+
+		uniqueVersion = false
+		configuration = configurations.deployerJars
+
+		repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
+			authentication(userName: sonatypeUsername, password: sonatypePassword)
+		}
+		snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+			authentication(userName: sonatypeUsername, password: sonatypePassword)
+		}
+
+		pom.project {
+			name "Scannit"
+			packaging "jar"
+			description "An extensible Java Metadata/annotation scanner"
+			url "https://github.com/hierynomus/scannit"
+			inceptionYear "2011"
+
+			scm {
+				url "https://github.com/hierynomus/scannit/"
+			}
+
+			licenses {
+				license {
+					name "The Apache Software License, Version 2.0"
+					url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+					distribution "repo"
+				}
+			}
+
+			developers {
+				developer {
+					id "hierynomus"
+					name "Jeroen van Erp"
+					url "http://www.javadude.nl"
+					roles {
+						role "Developer"
+					}
+				}
+			}
+		}
+	}
+	project.poms << project.deployer.pom
+}
+
+// Remove test deps from all poms
+project.poms*.whenConfigured { pom ->
+	pom.dependencies.removeAll(pom.dependencies.findAll { it.scope == "test" })
+}
+
+
+
+
+//license = new File(project.projectDir, 'LICENSE_HEADER')
 

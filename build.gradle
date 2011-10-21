@@ -4,20 +4,20 @@ buildscript {
 	repositories {
 		mavenLocal()
 		mavenCentral()
-		mavenRepo name: "Gradle", urls: "http://repo.gradle.org/gradle/plugins-snapshots/"
+        mavenRepo urls: 'http://evgeny-goldin.org/artifactory/repo/'
 	}
 	dependencies {
-		classpath "org.gradle.plugins:gradle-signing-plugin:0.0.1-SNAPSHOT"
+        classpath 'de.huxhorn.gradle:de.huxhorn.gradle.pgp-plugin:0.0.3'
 	}
 }
 
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'maven'
-apply plugin: 'signing'
+apply plugin: de.huxhorn.gradle.pgp.PgpPlugin
 
 group = 'nl.javadude.scannit'
-version = '0.13-SNAPSHOT'
+version = '0.13'
 
 repositories {
 	mavenLocal()
@@ -27,8 +27,6 @@ repositories {
 trueZipVersion="7.3.4"
 
 configurations {
-	deployerJars
-	published.extendsFrom archives, signatures
 }
 
 dependencies {
@@ -42,7 +40,7 @@ dependencies {
 	testCompile "org.hamcrest:hamcrest-core:1.2.1"
 	testCompile "org.hamcrest:hamcrest-library:1.2.1"
 	testRuntime "ch.qos.logback:logback-classic:0.9.30"
-	deployerJars "org.apache.maven.wagon:wagon-http-lightweight:1.0-beta-6"
+//	deployerJars "org.apache.maven.wagon:wagon-http-lightweight:1.0-beta-6"
 }
 
 task sourcesJar(type: Jar) {
@@ -59,25 +57,13 @@ artifacts {
 	archives sourcesJar, javadocJar
 }
 
-signing {
-	sign configurations.archives
+pgp {
+	secretKeyRingFile = new File("${System.properties['user.home']}/.gnupg/secring.gpg")
 }
 
-project.poms = [project.install.repositories.mavenInstaller.pom]
-uploadPublished {
-	project.deployer = repositories.mavenDeployer {
-		beforeDeployment { MavenDeployment deployment ->
-			if (signing.signatory) {
-				def signedPomArtifact = sign(deployment.pomArtifact).singleArtifact
-				// Have to alter the '?type'? of the artifact to match what is published
-				// See http://issues.gradle.org/browse/GRADLE-1589
-				signedPomArtifact.type = "pom." + signing.type.extension
-				deployment.addArtifact(signedPomArtifact)
-			}
-		}
-
-		uniqueVersion = false
-		configuration = configurations.deployerJars
+uploadArchives {
+	repositories.mavenDeployer {
+		configuration = configurations.archives
 
 		repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
 			authentication(userName: sonatypeUsername, password: sonatypePassword)
@@ -117,16 +103,5 @@ uploadPublished {
 			}
 		}
 	}
-	project.poms << project.deployer.pom
 }
-
-// Remove test deps from all poms
-project.poms*.whenConfigured { pom ->
-	pom.dependencies.removeAll(pom.dependencies.findAll { it.scope == "test" })
-}
-
-
-
-
-//license = new File(project.projectDir, 'LICENSE_HEADER')
 

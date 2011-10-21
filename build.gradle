@@ -17,7 +17,7 @@ apply plugin: 'maven'
 apply plugin: de.huxhorn.gradle.pgp.PgpPlugin
 
 group = 'nl.javadude.scannit'
-version = '0.13'
+version = '0.14-SNAPSHOT'
 
 repositories {
 	mavenLocal()

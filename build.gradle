@@ -24,7 +24,7 @@ repositories {
 	mavenCentral()
 }
 
-trueZipVersion="7.3.1"
+trueZipVersion="7.3.4"
 
 configurations {
 	deployerJars
@@ -32,15 +32,16 @@ configurations {
 }
 
 dependencies {
-	compile "javassist:javassist:3.8.0.GA"
-	compile "org.slf4j:slf4j-api:1.6.1"
-	compile "com.google.guava:guava:r09"
+	compile "org.javassist:javassist:3.15.0-GA"
+	compile "org.slf4j:slf4j-api:1.6.3"
+	compile "com.google.guava:guava:10.0.1"
 	compile "de.schlichtherle.truezip:truezip-kernel:${trueZipVersion}"
 	compile "de.schlichtherle.truezip:truezip-file:${trueZipVersion}"
 	compile "de.schlichtherle.truezip:truezip-driver-zip:${trueZipVersion}"
-	testCompile "junit:junit:4.8.2"
-	testCompile "org.hamcrest:hamcrest-all:1.1"
-	testRuntime "ch.qos.logback:logback-classic:0.9.24"
+	testCompile "junit:junit:4.10"
+	testCompile "org.hamcrest:hamcrest-core:1.2.1"
+	testCompile "org.hamcrest:hamcrest-library:1.2.1"
+	testRuntime "ch.qos.logback:logback-classic:0.9.30"
 	deployerJars "org.apache.maven.wagon:wagon-http-lightweight:1.0-beta-6"
 }
 

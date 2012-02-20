@@ -21,13 +21,15 @@ public class ArchiveEntrySupplier {
 
 	public void withArchiveEntries(Predicate<TFile> with) {
 		TFile tFile = getTFile(uri);
-		List<TFile> entries = list(tFile);
+		try {
+			List<TFile> entries = list(tFile);
 
-		for (TFile file : entries) {
-			with.apply(file);
+			for (TFile file : entries) {
+				with.apply(file);
+			}
+		} finally {
+			closeTFile(tFile);
 		}
-
-		closeTFile(tFile);
 	}
 
 	private List<TFile> list(TFile tFile) {
@@ -81,6 +83,8 @@ public class ArchiveEntrySupplier {
 		} catch (ServiceConfigurationError re) {
 			logger.error("Error scanning {}, continuing...", tFile);
 			logger.debug("Error was: ", re);
+		} finally {
+			closeTFile(tFile);
 		}
 	}
 

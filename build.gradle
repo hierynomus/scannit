@@ -1,26 +1,12 @@
-import org.gradle.plugin.pgp.signing.*
-
-buildscript {
-	repositories {
-		mavenLocal()
-		mavenCentral()
-        mavenRepo urls: 'http://evgeny-goldin.org/artifactory/repo/'
-	}
-	dependencies {
-        classpath 'de.huxhorn.gradle:de.huxhorn.gradle.pgp-plugin:0.0.3'
-	}
-}
-
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'maven'
-apply plugin: de.huxhorn.gradle.pgp.PgpPlugin
+apply plugin: 'signing'
 
 group = 'nl.javadude.scannit'
 version = '0.14-SNAPSHOT'
 
 repositories {
-	mavenLocal()
 	mavenCentral()
 }
 
@@ -40,7 +26,6 @@ dependencies {
 	testCompile "org.hamcrest:hamcrest-core:1.2.1"
 	testCompile "org.hamcrest:hamcrest-library:1.2.1"
 	testRuntime "ch.qos.logback:logback-classic:0.9.30"
-//	deployerJars "org.apache.maven.wagon:wagon-http-lightweight:1.0-beta-6"
 }
 
 task sourcesJar(type: Jar) {
@@ -57,47 +42,50 @@ artifacts {
 	archives sourcesJar, javadocJar
 }
 
-pgp {
-	secretKeyRingFile = new File("${System.properties['user.home']}/.gnupg/secring.gpg")
+signing {
+	sign configurations.archives
 }
 
 uploadArchives {
-	repositories.mavenDeployer {
-		configuration = configurations.archives
+	if(project.hasProperty('sonatypeUsername')) {
+		repositories.mavenDeployer {
+			beforeDeployment { MavenDeployment deployment -> signPom(deployment) }
+			configuration = configurations.archives
 
-		repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
-			authentication(userName: sonatypeUsername, password: sonatypePassword)
-		}
-		snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-			authentication(userName: sonatypeUsername, password: sonatypePassword)
-		}
-
-		pom.project {
-			name "Scannit"
-			packaging "jar"
-			description "An extensible Java Metadata/annotation scanner"
-			url "https://github.com/hierynomus/scannit"
-			inceptionYear "2011"
-
-			scm {
-				url "https://github.com/hierynomus/scannit/"
+			repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
+				authentication(userName: sonatypeUsername, password: sonatypePassword)
+			}
+			snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+				authentication(userName: sonatypeUsername, password: sonatypePassword)
 			}
 
-			licenses {
-				license {
-					name "The Apache Software License, Version 2.0"
-					url "http://www.apache.org/licenses/LICENSE-2.0.txt"
-					distribution "repo"
+			pom.project {
+				name "Scannit"
+				packaging "jar"
+				description "An extensible Java Metadata/annotation scanner"
+				url "https://github.com/hierynomus/scannit"
+				inceptionYear "2011"
+
+				scm {
+					url "https://github.com/hierynomus/scannit/"
 				}
-			}
 
-			developers {
-				developer {
-					id "hierynomus"
-					name "Jeroen van Erp"
-					url "http://www.javadude.nl"
-					roles {
-						role "Developer"
+				licenses {
+					license {
+						name "The Apache Software License, Version 2.0"
+						url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+						distribution "repo"
+					}
+				}
+
+				developers {
+					developer {
+						id "hierynomus"
+						name "Jeroen van Erp"
+						url "http://www.javadude.nl"
+						roles {
+							role "Developer"
+						}
 					}
 				}
 			}

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.ServiceConfigurationError;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static nl.javadude.scannit.reader.TFiles.tFile;
 
 public class ArchiveEntrySupplier {
 	private final URI uri;
@@ -20,7 +21,7 @@ public class ArchiveEntrySupplier {
 	}
 
 	public void withArchiveEntries(Predicate<TFile> with) {
-		TFile tFile = getTFile(uri);
+		TFile tFile = tFile(uri);
 		try {
 			List<TFile> entries = list(tFile);
 
@@ -32,7 +33,12 @@ public class ArchiveEntrySupplier {
 		}
 	}
 
-	private List<TFile> list(TFile tFile) {
+    // Extracted for testing..
+    protected void closeTFile(TFile tFile) {
+        TFiles.umountQuietly(tFile);
+    }
+
+    private List<TFile> list(TFile tFile) {
 		List<TFile> entries = newArrayList();
 		if (tFile.isArchive()) {
 			gatherEntries(tFile, entries, true);
@@ -40,26 +46,6 @@ public class ArchiveEntrySupplier {
 			gatherEntries(tFile, entries, false);
 		}
 		return entries;
-	}
-
-	protected void closeTFile(TFile tFile) {
-		try {
-			if (tFile.isArchive()) {
-				TFile.umount(tFile);
-			}
-		} catch (FsSyncException e) {
-			logger.error("Could not umount {}, continuing", tFile);
-			logger.debug("Exception was: ", e);
-		}
-	}
-
-	private TFile getTFile(URI uri) {
-		if (uri.getPath() != null) {
-			// if the URI has a path, this means it is a real file, use the detection of the path, and not look at the scheme
-			return new TFile(uri.getPath());
-		} else {
-			return new TFile(uri);
-		}
 	}
 
 	private void gatherEntries(TFile tFile, List<TFile> files, boolean scanInArchives) {

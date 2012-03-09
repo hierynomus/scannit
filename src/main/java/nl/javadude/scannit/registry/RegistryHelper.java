@@ -26,12 +26,14 @@ import java.lang.annotation.Inherited;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 import static com.google.common.collect.ImmutableSet.copyOf;
 import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Sets.newHashSet;
+import static java.util.Collections.singleton;
 import static nl.javadude.scannit.metadata.DescriptorHelper.*;
 
 public class RegistryHelper {
@@ -45,7 +47,9 @@ public class RegistryHelper {
         Set<String> strings = newHashSet(registry.get(TypeAnnotationScanner.class).get(annotation.getName()));
 
         if (findInheritors && annotation.isAnnotationPresent(Inherited.class)) {
-            strings.addAll(findSubtypes(strings));
+        	Set<String> moreStrings = newHashSet();
+            findSubtypes(strings, moreStrings);
+            strings.addAll(moreStrings);
         }
 
         return convertToClassSet(strings);
@@ -61,22 +65,20 @@ public class RegistryHelper {
     }
 
     public <T> Set<Class<? extends T>> getSubTypesOf(Class<T> clazz) {
-        HashSet<String> strings = newHashSet(registry.get(SubTypeScanner.class).get(clazz.getName()));
-        strings.addAll(findSubtypes(strings));
+        HashSet<String> strings = newHashSet();
+        findSubtypes(singleton(clazz.getName()), strings);
         return this.<T>convertToClassSet(strings);
     }
 
-    private Collection<String> findSubtypes(Collection<String> superclazzes) {
-        Set<String> subclazzes = newHashSet();
+    private void findSubtypes(Collection<String> superclazzes, Set<String> subclazzesCollector) {
         for (String superclazz : superclazzes) {
             Collection<String> strings = registry.get(SubTypeScanner.class).get(superclazz);
             if (!strings.isEmpty()) {
-                subclazzes.addAll(strings);
-                subclazzes.addAll(findSubtypes(subclazzes));
+            	subclazzesCollector.addAll(strings);
+                findSubtypes(strings, subclazzesCollector);
             }
         }
 
-        return subclazzes;
     }
 
     public Set<Method> getMethodsAnnotatedWith(Class<? extends Annotation> annotation) {

@@ -24,8 +24,11 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class Scannit {
+	private static final AtomicReference<Scannit> REF = new AtomicReference<Scannit>();
+
     final Registry registry = new Registry();
     private RegistryHelper registryHelper;
 
@@ -34,6 +37,22 @@ public class Scannit {
         new Worker(configuration, registry).scan();
         registryHelper = new RegistryHelper(registry);
     }
+
+	public static synchronized Scannit boot(Configuration configuration) {
+		REF.set(new Scannit(configuration));
+		return REF.get();
+	}
+
+	public static synchronized void setInstance(Scannit scannit) {
+		REF.set(scannit);
+	}
+
+	public static synchronized Scannit getInstance() {
+		if (REF.get() != null) {
+			return REF.get();
+		}
+		throw new IllegalStateException("Scannit not set via setInstance(Scannit) or boot(Configuration)");
+	}
 
     public Set<Class<?>> getTypesAnnotatedWith(Class<? extends Annotation> annotation) {
         return registryHelper.getTypesAnnotatedWith(annotation, true);

@@ -5,13 +5,13 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 
 group = 'nl.javadude.scannit'
-version = '1.0.1-SNAPSHOT'
+version = '1.0.1'
 
 repositories {
 	mavenCentral()
 }
 
-trueZipVersion="7.3.4"
+project.ext.trueZipVersion="7.3.4"
 
 configurations {
 }

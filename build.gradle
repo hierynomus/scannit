@@ -5,7 +5,7 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 
 group = 'nl.javadude.scannit'
-version = '1.0.1'
+version = '1.0.2-SNAPSHOT'
 
 repositories {
 	mavenCentral()
@@ -50,7 +50,7 @@ signing {
 uploadArchives {
 	if(project.hasProperty('sonatypeUsername')) {
 		repositories.mavenDeployer {
-			beforeDeployment { MavenDeployment deployment -> signPom(deployment) }
+			beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 			configuration = configurations.archives
 
 			repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {

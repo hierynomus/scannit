@@ -17,23 +17,19 @@
 
 package nl.javadude.scannit.reader;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Lists;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import com.google.common.base.Function;
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 
 /**
@@ -54,6 +50,7 @@ public class ClasspathReader {
 
     /**
      * Finds all URIs in the ContextClassLoader which contain a certain package.
+     *
      * @param packagePrefix The (prefix) package to search for
      * @return all matching URIs, each URI includes the package!
      */
@@ -71,17 +68,18 @@ public class ClasspathReader {
         return newHashSet(uris);
     }
 
-	private String packagePrefixToPath(String packagePrefix) {
-		return packagePrefix.replaceAll("\\.", "/");
-	}
+    private String packagePrefixToPath(String packagePrefix) {
+        return packagePrefix.replaceAll("\\.", "/");
+    }
 
-	/**
-	 * Extracted for testing purposes, so we can inject with a mock classloader.
-	 * @return The thread context classloader.
-	 */
-	protected ClassLoader getClassLoader() {
-		return Thread.currentThread().getContextClassLoader();
-	}
+    /**
+     * Extracted for testing purposes, so we can inject with a mock classloader.
+     *
+     * @return The thread context classloader.
+     */
+    protected ClassLoader getClassLoader() {
+        return Thread.currentThread().getContextClassLoader();
+    }
 
     /**
      * Finds all the base URIs which contain a (prefix) package. The URIs are returned without the actual package, opposed to a call to {@link #findURIs(String)}
@@ -93,15 +91,15 @@ public class ClasspathReader {
         Set<URI> result = newHashSet();
 
         Set<URI> urIs = findURIs(prefix);
-	    String path = packagePrefixToPath(prefix);
+        String path = packagePrefixToPath(prefix);
         for (URI urI : urIs) {
-	        String schemeSpecificPart = urI.getSchemeSpecificPart();
-	        String based = schemeSpecificPart.substring(0, schemeSpecificPart.length() - path.length());
-	        try {
-		        result.add(new URI(urI.getScheme(), based, urI.getFragment()));
-	        } catch (URISyntaxException e) {
-		        throw new RuntimeException(e);
-	        }
+            String schemeSpecificPart = urI.getSchemeSpecificPart();
+            String based = schemeSpecificPart.substring(0, schemeSpecificPart.length() - path.length());
+            try {
+                result.add(new URI(urI.getScheme(), based, urI.getFragment()));
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         logger.debug("Found base uris: {}", result);

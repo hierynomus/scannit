@@ -17,16 +17,18 @@
 
 package nl.javadude.scannit.metadata;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
-import com.google.common.io.Closeables;
-import de.schlichtherle.truezip.file.TFile;
-import de.schlichtherle.truezip.file.TFileInputStream;
-import javassist.bytecode.*;
-import javassist.bytecode.annotation.Annotation;
-
 import java.io.*;
 import java.util.List;
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+
+import de.schlichtherle.truezip.file.TFile;
+import de.schlichtherle.truezip.file.TFileInputStream;
+import javassist.bytecode.AnnotationsAttribute;
+import javassist.bytecode.ClassFile;
+import javassist.bytecode.FieldInfo;
+import javassist.bytecode.MethodInfo;
+import javassist.bytecode.annotation.Annotation;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.io.Closeables.closeQuietly;

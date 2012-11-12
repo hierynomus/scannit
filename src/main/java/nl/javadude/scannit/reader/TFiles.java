@@ -1,18 +1,18 @@
 package nl.javadude.scannit.reader;
 
-import de.schlichtherle.truezip.file.TFile;
-import de.schlichtherle.truezip.fs.FsSyncException;
+import java.net.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URI;
+import de.schlichtherle.truezip.file.TFile;
+import de.schlichtherle.truezip.fs.FsSyncException;
 
 final class TFiles {
 
     private TFiles() {
         // Do not instantiate
     }
-    
+
     public static TFile tFile(URI uri) {
         if (uri.getPath() != null) {
             // if the URI has a path, this means it is a real file, use the detection of the path, and not look at the scheme

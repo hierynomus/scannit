@@ -18,11 +18,10 @@
 package nl.javadude.scannit.scanner;
 
 import com.google.common.base.Predicates;
+
 import javassist.bytecode.ClassFile;
 import nl.javadude.scannit.registry.Registry;
 
-import static com.google.common.base.Predicates.equalTo;
-import static com.google.common.base.Predicates.not;
 import static nl.javadude.scannit.metadata.DescriptorHelper.toTypeDescriptor;
 
 /**
@@ -40,7 +39,8 @@ public class SubTypeScanner extends AbstractScanner {
 
     /**
      * Scans the ClassFile and builds up the type hierarchy (including the annotations).
-     * @param file The ClassFile to be scanned
+     *
+     * @param file     The ClassFile to be scanned
      * @param registry The registry to store the scanned information in.
      */
     @Override

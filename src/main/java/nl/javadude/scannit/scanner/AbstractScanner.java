@@ -18,6 +18,7 @@
 package nl.javadude.scannit.scanner;
 
 import com.google.common.base.Predicate;
+
 import javassist.bytecode.ClassFile;
 import nl.javadude.scannit.registry.Registry;
 
@@ -35,6 +36,7 @@ public abstract class AbstractScanner {
 
     /**
      * Chain a new Filter to the curent one.
+     *
      * @param filter
      */
     public void addFilter(Predicate<CharSequence> filter) {
@@ -50,6 +52,7 @@ public abstract class AbstractScanner {
 
     /**
      * Determine whether this scanner accepts the name of this entry.
+     *
      * @param name the name of an entry
      * @return true if the filters accept the name
      */
@@ -59,7 +62,8 @@ public abstract class AbstractScanner {
 
     /**
      * Scan a ClassFile (if it is accepted)
-     * @param file The Javassist ClassFile to scan.
+     *
+     * @param file     The Javassist ClassFile to scan.
      * @param registry The Registry to store the scanned information in.
      */
     public void scan(ClassFile file, Registry registry) {
@@ -70,7 +74,8 @@ public abstract class AbstractScanner {
 
     /**
      * Overridden by subclasses to do the actual scanning.
-     * @param file The ClassFile to be scanned
+     *
+     * @param file     The ClassFile to be scanned
      * @param registry The registry to store the scanned information in.
      */
     protected abstract void doScan(ClassFile file, Registry registry);

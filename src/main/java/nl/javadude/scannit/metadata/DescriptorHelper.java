@@ -17,15 +17,15 @@
 
 package nl.javadude.scannit.metadata;
 
-import javassist.bytecode.ClassFile;
-import javassist.bytecode.Descriptor;
-import javassist.bytecode.FieldInfo;
-import javassist.bytecode.MethodInfo;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
+
+import javassist.bytecode.ClassFile;
+import javassist.bytecode.Descriptor;
+import javassist.bytecode.FieldInfo;
+import javassist.bytecode.MethodInfo;
 
 import static com.google.common.collect.Lists.newArrayList;
 
@@ -41,6 +41,7 @@ public class DescriptorHelper {
 
     /**
      * Convert the Javassist ClassFile to a String representation.
+     *
      * @param file a Javassist ClassFile
      * @return a String representing the full class name
      */
@@ -50,7 +51,8 @@ public class DescriptorHelper {
 
     /**
      * Convert a Javassist ClassFile and MethodInfo to a String representation.
-     * @param file a Javassist ClassFile
+     *
+     * @param file   a Javassist ClassFile
      * @param method a Javassist MethodInfo
      * @return a String representing the full class name followed by the method and its signature
      */
@@ -64,7 +66,8 @@ public class DescriptorHelper {
 
     /**
      * Convert a Javassist ClassFile and FieldInfo to a String representation.
-     * @param file a Javassist ClassFile
+     *
+     * @param file  a Javassist ClassFile
      * @param field a Javassist FieldInfo
      * @return a String representing the full class name followed by the field name.
      */
@@ -74,6 +77,7 @@ public class DescriptorHelper {
 
     /**
      * Convert a String representation of the class to a Java class
+     *
      * @param descriptor the full class name
      * @return a Java class
      */
@@ -87,6 +91,7 @@ public class DescriptorHelper {
 
     /**
      * Convert a String representation of the method to a Java Reflect Method
+     *
      * @param methodDescriptor the full string representation of the method (including class name and parameters)
      * @return a Java Reflect Method
      */
@@ -144,6 +149,7 @@ public class DescriptorHelper {
 
     /**
      * Convert a string representation of a field to a Java Reflect Field.
+     *
      * @param fieldDescriptor a String representation of a Field (including the class name)
      * @return a Java Reflect Field
      */

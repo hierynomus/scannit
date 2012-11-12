@@ -17,18 +17,17 @@
 
 package nl.javadude.scannit.registry;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableSet;
-import nl.javadude.scannit.scanner.*;
-
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Inherited;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableSet;
+
+import nl.javadude.scannit.scanner.*;
 
 import static com.google.common.collect.ImmutableSet.copyOf;
 import static com.google.common.collect.Iterables.transform;
@@ -43,11 +42,11 @@ public class RegistryHelper {
         this.registry = registry;
     }
 
-    public Set<Class<?>> getTypesAnnotatedWith(Class<? extends Annotation> annotation,  boolean findInheritors) {
+    public Set<Class<?>> getTypesAnnotatedWith(Class<? extends Annotation> annotation, boolean findInheritors) {
         Set<String> strings = newHashSet(registry.get(TypeAnnotationScanner.class).get(annotation.getName()));
 
         if (findInheritors && annotation.isAnnotationPresent(Inherited.class)) {
-        	Set<String> moreStrings = newHashSet();
+            Set<String> moreStrings = newHashSet();
             findSubtypes(strings, moreStrings);
             strings.addAll(moreStrings);
         }
@@ -58,8 +57,8 @@ public class RegistryHelper {
     private <T> ImmutableSet<Class<? extends T>> convertToClassSet(Set<String> strings) {
         return copyOf(transform(strings, new Function<String, Class<? extends T>>() {
             public Class<? extends T> apply(String input) {
-	            //noinspection unchecked
-	            return (Class<? extends T>) fromTypeDescriptor(input);
+                //noinspection unchecked
+                return (Class<? extends T>) fromTypeDescriptor(input);
             }
         }));
     }
@@ -74,7 +73,7 @@ public class RegistryHelper {
         for (String superclazz : superclazzes) {
             Collection<String> strings = registry.get(SubTypeScanner.class).get(superclazz);
             if (!strings.isEmpty()) {
-            	subclazzesCollector.addAll(strings);
+                subclazzesCollector.addAll(strings);
                 findSubtypes(strings, subclazzesCollector);
             }
         }

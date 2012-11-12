@@ -17,7 +17,10 @@
 
 package nl.javadude.scannit;
 
+import java.net.URI;
+import java.util.Set;
 import com.google.common.base.Predicate;
+
 import de.schlichtherle.truezip.file.TFile;
 import javassist.bytecode.ClassFile;
 import nl.javadude.scannit.metadata.JavassistHelper;
@@ -25,9 +28,6 @@ import nl.javadude.scannit.reader.ArchiveEntrySupplier;
 import nl.javadude.scannit.reader.ClasspathReader;
 import nl.javadude.scannit.registry.Registry;
 import nl.javadude.scannit.scanner.AbstractScanner;
-
-import java.net.URI;
-import java.util.Set;
 
 class Worker {
 
@@ -49,22 +49,22 @@ class Worker {
 
     private void scanURI(Set<URI> baseURIs) {
         for (URI baseURI : baseURIs) {
-	        ArchiveEntrySupplier entrySupplier = new ArchiveEntrySupplier(baseURI);
-	        scanFiles(entrySupplier);
+            ArchiveEntrySupplier entrySupplier = new ArchiveEntrySupplier(baseURI);
+            scanFiles(entrySupplier);
         }
     }
 
 
     private void scanFiles(ArchiveEntrySupplier entrySupplier) {
-	    entrySupplier.withArchiveEntries(new Predicate<TFile>() {
-		    public boolean apply(TFile tFile) {
-			    if (tFile.getName().endsWith(".class")) {
-			        ClassFile classFile = JavassistHelper.readFile(tFile);
-			        scanFile(classFile);
-			    }
-			    return true;
-		    }
-	    });
+        entrySupplier.withArchiveEntries(new Predicate<TFile>() {
+            public boolean apply(TFile tFile) {
+                if (tFile.getName().endsWith(".class")) {
+                    ClassFile classFile = JavassistHelper.readFile(tFile);
+                    scanFile(classFile);
+                }
+                return true;
+            }
+        });
     }
 
     private void scanFile(ClassFile classFile) {

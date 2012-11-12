@@ -23,6 +23,9 @@ import java.lang.reflect.Method;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import nl.javadude.scannit.registry.Registry;
 import nl.javadude.scannit.registry.RegistryHelper;
 
@@ -39,8 +42,20 @@ public class Scannit {
     }
 
     public static synchronized Scannit boot(Configuration configuration) {
-        REF.set(new Scannit(configuration));
+        return boot(configuration, false);
+    }
+
+    public static synchronized Scannit boot(Configuration configuration, boolean force) {
+        if (force || !isBooted()) {
+            REF.set(new Scannit(configuration));
+        } else {
+            logger.info("Not re-booting Scannit, because it was already booted.");
+        }
         return REF.get();
+    }
+
+    public static synchronized boolean isBooted() {
+        return REF.get() != null;
     }
 
     public static synchronized void setInstance(Scannit scannit) {
@@ -69,5 +84,8 @@ public class Scannit {
     public <T> Set<Class<? extends T>> getSubTypesOf(Class<T> clazz) {
         return registryHelper.getSubTypesOf(clazz);
     }
+
+    private static final Logger logger = LoggerFactory.getLogger(Scannit.class);
+
 }
 

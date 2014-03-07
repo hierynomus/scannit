@@ -19,11 +19,12 @@ package nl.javadude.scannit.registry;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
-import com.google.common.collect.MapMaker;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
@@ -34,7 +35,7 @@ import nl.javadude.scannit.scanner.AbstractScanner;
  * The registry of everything that Scannit scanned.
  */
 public class Registry {
-    private final Map<String, Multimap<String, String>> register = new MapMaker().makeComputingMap(new Function<String, Multimap<String, String>>() {
+    private final LoadingCache<String, Multimap<String, String>> register = CacheBuilder.newBuilder().build(CacheLoader.from(new Function<String, Multimap<String, String>>() {
         public Multimap<String, String> apply(String input) {
             return Multimaps.newSetMultimap(new HashMap<String, Collection<String>>(), new Supplier<Set<String>>() {
                 public Set<String> get() {
@@ -42,7 +43,7 @@ public class Registry {
                 }
             });
         }
-    });
+    }));
 
     /**
      * Get the registry of the scanner
@@ -61,7 +62,7 @@ public class Registry {
      * @return the scanned information of this scanner
      */
     public Multimap<String, String> get(Class<? extends AbstractScanner> clazz) {
-        return register.get(clazz.getName());
+        return register.getUnchecked(clazz.getName());
     }
 }
 

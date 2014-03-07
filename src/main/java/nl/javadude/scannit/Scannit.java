@@ -26,11 +26,14 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.util.concurrent.Monitor;
+
 import nl.javadude.scannit.registry.Registry;
 import nl.javadude.scannit.registry.RegistryHelper;
 
 public class Scannit {
     private static final AtomicReference<Scannit> REF = new AtomicReference<Scannit>();
+    private static final Monitor M = new Monitor();
 
     final Registry registry = new Registry();
     private RegistryHelper registryHelper;
@@ -41,32 +44,47 @@ public class Scannit {
         registryHelper = new RegistryHelper(registry);
     }
 
-    public static synchronized Scannit boot(Configuration configuration) {
+    public static Scannit boot(Configuration configuration) {
         return boot(configuration, false);
     }
 
-    public static synchronized Scannit boot(Configuration configuration, boolean force) {
-        if (force || !isBooted()) {
-            REF.set(new Scannit(configuration));
-        } else {
-            logger.info("Not re-booting Scannit, because it was already booted.");
+    public static Scannit boot(Configuration configuration, boolean force) {
+        try {
+            M.enter();
+            if (force || !isBooted()) {
+                REF.set(new Scannit(configuration));
+            } else {
+                logger.info("Not re-booting Scannit, because it was already booted.");
+            }
+            return REF.get();
+        } finally {
+            M.leave();
         }
-        return REF.get();
     }
 
-    public static synchronized boolean isBooted() {
+    public static boolean isBooted() {
         return REF.get() != null;
     }
 
-    public static synchronized void setInstance(Scannit scannit) {
-        REF.set(scannit);
+    public static void setInstance(Scannit scannit) {
+        try {
+            M.enter();
+            REF.set(scannit);
+        } finally {
+            M.leave();
+        }
     }
 
-    public static synchronized Scannit getInstance() {
-        if (REF.get() != null) {
-            return REF.get();
+    public static Scannit getInstance() {
+        try {
+            M.enter();
+            if (REF.get() != null) {
+                return REF.get();
+            }
+            throw new IllegalStateException("Scannit not set via setInstance(Scannit) or boot(Configuration)");
+        } finally {
+            M.leave();
         }
-        throw new IllegalStateException("Scannit not set via setInstance(Scannit) or boot(Configuration)");
     }
 
     public Set<Class<?>> getTypesAnnotatedWith(Class<? extends Annotation> annotation) {

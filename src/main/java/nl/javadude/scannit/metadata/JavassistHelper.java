@@ -31,7 +31,6 @@ import javassist.bytecode.MethodInfo;
 import javassist.bytecode.annotation.Annotation;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.io.Closeables.closeQuietly;
 
 public class JavassistHelper {
 
@@ -80,6 +79,14 @@ public class JavassistHelper {
     public static List<String> getFieldAnnotations(FieldInfo field) {
         AnnotationsAttribute attribute = (AnnotationsAttribute) field.getAttribute(AnnotationsAttribute.visibleTag);
         return readAnnotations(attribute);
+    }
+
+    public static void closeQuietly(Closeable c) {
+        try {
+            com.google.common.io.Closeables.close(c, true);
+        } catch (IOException e) {
+            // will not happen due to true
+        }
     }
 }
 

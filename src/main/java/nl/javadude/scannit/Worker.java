@@ -17,17 +17,17 @@
 
 package nl.javadude.scannit;
 
-import java.net.URI;
-import java.util.Set;
-import com.google.common.base.Predicate;
-
 import de.schlichtherle.truezip.file.TFile;
 import javassist.bytecode.ClassFile;
 import nl.javadude.scannit.metadata.JavassistHelper;
+import nl.javadude.scannit.predicates.Predicate;
 import nl.javadude.scannit.reader.ArchiveEntrySupplier;
 import nl.javadude.scannit.reader.ClasspathReader;
 import nl.javadude.scannit.registry.Registry;
 import nl.javadude.scannit.scanner.AbstractScanner;
+
+import java.net.URI;
+import java.util.Set;
 
 class Worker {
 

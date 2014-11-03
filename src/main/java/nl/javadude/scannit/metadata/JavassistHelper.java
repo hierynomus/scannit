@@ -18,9 +18,8 @@
 package nl.javadude.scannit.metadata;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileInputStream;
@@ -29,10 +28,12 @@ import javassist.bytecode.ClassFile;
 import javassist.bytecode.FieldInfo;
 import javassist.bytecode.MethodInfo;
 import javassist.bytecode.annotation.Annotation;
-
-import static com.google.common.collect.Lists.newArrayList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JavassistHelper {
+
+    private static final Logger logger = LoggerFactory.getLogger(JavassistHelper.class);
 
     public static ClassFile readFile(TFile file) {
         try {
@@ -62,13 +63,13 @@ public class JavassistHelper {
     }
 
     private static List<String> readAnnotations(AnnotationsAttribute attribute) {
-        if (attribute == null) return newArrayList();
+        if (attribute == null) return new ArrayList<String>();
         Annotation[] annotations = attribute.getAnnotations();
-        return Lists.transform(Lists.newArrayList(annotations), new Function<Annotation, String>() {
-            public String apply(Annotation input) {
-                return input.getTypeName();
-            }
-        });
+        List<String> anns = new ArrayList<String>();
+        for (Annotation annotation : annotations) {
+            anns.add(annotation.getTypeName());
+        }
+        return anns;
     }
 
     public static List<String> getMethodAnnotations(MethodInfo method) {
@@ -82,10 +83,11 @@ public class JavassistHelper {
     }
 
     public static void closeQuietly(Closeable c) {
+        if (c == null) return;
         try {
-            com.google.common.io.Closeables.close(c, true);
+            c.close();
         } catch (IOException e) {
-            // will not happen due to true
+            logger.warn("IOException when closing Closeable", e);
         }
     }
 }

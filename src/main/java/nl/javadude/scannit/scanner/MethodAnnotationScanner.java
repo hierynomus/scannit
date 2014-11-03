@@ -46,7 +46,7 @@ public class MethodAnnotationScanner extends AbstractScanner {
 
     private void registerAnnotations(List<String> methodAnnotations, ClassFile file, MethodInfo method, Registry registry) {
         for (String methodAnnotation : methodAnnotations) {
-            registry.get(this).put(methodAnnotation, toMethodDescriptor(file, method));
+            addToRegistry(registry, methodAnnotation, toMethodDescriptor(file, method));
         }
     }
 }

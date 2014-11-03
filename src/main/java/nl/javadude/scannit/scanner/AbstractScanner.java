@@ -17,13 +17,16 @@
 
 package nl.javadude.scannit.scanner;
 
-import com.google.common.base.Predicate;
-
 import javassist.bytecode.ClassFile;
+import nl.javadude.scannit.predicates.Predicate;
+import nl.javadude.scannit.predicates.Predicates;
 import nl.javadude.scannit.registry.Registry;
 
-import static com.google.common.base.Predicates.alwaysTrue;
-import static com.google.common.base.Predicates.and;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import static nl.javadude.scannit.predicates.Predicates.alwaysTrue;
 
 /**
  * An abstract scanner implementation which does filtering of the inputs.
@@ -40,7 +43,7 @@ public abstract class AbstractScanner {
      * @param filter
      */
     public void addFilter(Predicate<CharSequence> filter) {
-        this.filter = and(filter, this.filter);
+        this.filter = Predicates.and(filter, this.filter);
     }
 
     /**
@@ -79,5 +82,15 @@ public abstract class AbstractScanner {
      * @param registry The registry to store the scanned information in.
      */
     protected abstract void doScan(ClassFile file, Registry registry);
+
+
+    protected void addToRegistry(Registry registry, String key, String descriptor) {
+        Map<String, Set<String>> stringSetMap = registry.get(this);
+        if (!stringSetMap.containsKey(key)) {
+            stringSetMap.put(key, new HashSet<String>());
+        }
+        stringSetMap.get(key).add(descriptor);
+    }
+
 }
 

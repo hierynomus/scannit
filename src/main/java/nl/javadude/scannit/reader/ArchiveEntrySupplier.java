@@ -1,15 +1,15 @@
 package nl.javadude.scannit.reader;
 
-import java.net.URI;
-import java.util.List;
-import java.util.ServiceConfigurationError;
+import de.schlichtherle.truezip.file.TFile;
+import nl.javadude.scannit.predicates.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.google.common.base.Predicate;
 
-import de.schlichtherle.truezip.file.TFile;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ServiceConfigurationError;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static nl.javadude.scannit.reader.TFiles.tFile;
 
 public class ArchiveEntrySupplier {
@@ -38,7 +38,7 @@ public class ArchiveEntrySupplier {
     }
 
     private List<TFile> list(TFile tFile) {
-        List<TFile> entries = newArrayList();
+        List<TFile> entries = new ArrayList<TFile>();
         if (tFile.isArchive()) {
             gatherEntries(tFile, entries, true);
         } else {

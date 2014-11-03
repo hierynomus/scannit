@@ -17,33 +17,18 @@
 
 package nl.javadude.scannit.registry;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Set;
-import com.google.common.base.Function;
-import com.google.common.base.Supplier;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
-import com.google.common.collect.Sets;
-
 import nl.javadude.scannit.scanner.AbstractScanner;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * The registry of everything that Scannit scanned.
  */
 public class Registry {
-    private final LoadingCache<String, Multimap<String, String>> register = CacheBuilder.newBuilder().build(CacheLoader.from(new Function<String, Multimap<String, String>>() {
-        public Multimap<String, String> apply(String input) {
-            return Multimaps.newSetMultimap(new HashMap<String, Collection<String>>(), new Supplier<Set<String>>() {
-                public Set<String> get() {
-                    return Sets.newHashSet();
-                }
-            });
-        }
-    }));
+
+    private final Map<String, Map<String, Set<String>>> register = new HashMap<String, Map<String, Set<String>>>();
 
     /**
      * Get the registry of the scanner
@@ -51,7 +36,7 @@ public class Registry {
      * @param scanner the scanner that needs to store or retrieve information
      * @return the scanned information of this scanner
      */
-    public Multimap<String, String> get(AbstractScanner scanner) {
+    public Map<String, Set<String>> get(AbstractScanner scanner) {
         return get(scanner.getClass());
     }
 
@@ -61,8 +46,12 @@ public class Registry {
      * @param clazz the scanner clazz for which we want to retrieve information
      * @return the scanned information of this scanner
      */
-    public Multimap<String, String> get(Class<? extends AbstractScanner> clazz) {
-        return register.getUnchecked(clazz.getName());
+    public Map<String, Set<String>> get(Class<? extends AbstractScanner> clazz) {
+        String name = clazz.getName();
+        if (!register.containsKey(name)) {
+            register.put(name, new HashMap<String, Set<String>>());
+        }
+        return register.get(name);
     }
 }
 

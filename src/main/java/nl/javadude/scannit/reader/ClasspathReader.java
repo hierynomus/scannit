@@ -17,36 +17,19 @@
 
 package nl.javadude.scannit.reader;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Set;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.google.common.base.Function;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Lists;
-
-import static com.google.common.collect.Sets.newHashSet;
+import java.util.*;
 
 /**
  * Reads the classLoader and returns URIs
  */
 public class ClasspathReader {
-
-    private Function<URL, URI> url2uri = new Function<URL, URI>() {
-        public URI apply(URL url) {
-            try {
-                logger.debug("Encountered URL: {}", url);
-                return url.toURI();
-            } catch (URISyntaxException e) {
-                throw new IllegalArgumentException("Could not convert URL: " + url + " to a URI", e);
-            }
-        }
-    };
 
     /**
      * Finds all URIs in the ContextClassLoader which contain a certain package.
@@ -58,14 +41,22 @@ public class ClasspathReader {
         String filePath = packagePrefixToPath(packagePrefix);
         logger.debug("Finding resources for prefix: {}", filePath);
         ClassLoader contextClassLoader = getClassLoader();
-        List<URI> uris;
+        List<URI> uris = new ArrayList<URI>();
         try {
             Enumeration<URL> resources = contextClassLoader.getResources(filePath);
-            uris = Lists.transform(Lists.newArrayList(Iterators.forEnumeration(resources)), url2uri);
+            while(resources.hasMoreElements()) {
+                URL url = resources.nextElement();
+                try {
+                    logger.debug("Encountered URL: {}", url);
+                    uris.add(url.toURI());
+                } catch (URISyntaxException e) {
+                    throw new IllegalArgumentException("Could not convert URL: " + url + " to a URI", e);
+                }
+            }
         } catch (IOException e) {
             throw new IllegalStateException("Could not fetch the resources matching " + filePath + " from the context classloader.", e);
         }
-        return newHashSet(uris);
+        return new HashSet<URI>(uris);
     }
 
     private String packagePrefixToPath(String packagePrefix) {
@@ -88,7 +79,7 @@ public class ClasspathReader {
      * @return the base URIs
      */
     public Set<URI> findBaseURIs(String prefix) {
-        Set<URI> result = newHashSet();
+        Set<URI> result = new HashSet<URI>();
 
         Set<URI> urIs = findURIs(prefix);
         String path = packagePrefixToPath(prefix);

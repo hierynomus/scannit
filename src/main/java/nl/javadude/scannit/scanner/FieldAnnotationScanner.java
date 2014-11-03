@@ -47,7 +47,7 @@ public class FieldAnnotationScanner extends AbstractScanner {
 
     private void registerAnnotations(List<String> fieldAnnotations, ClassFile file, FieldInfo field, Registry registry) {
         for (String fieldAnnotation : fieldAnnotations) {
-            registry.get(this).put(fieldAnnotation, tofieldDescriptor(file, field));
+            addToRegistry(registry, fieldAnnotation, tofieldDescriptor(file, field));
         }
     }
 }

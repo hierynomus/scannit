@@ -17,9 +17,8 @@
 
 package nl.javadude.scannit.scanner;
 
-import com.google.common.base.Predicates;
-
 import javassist.bytecode.ClassFile;
+import nl.javadude.scannit.predicates.Predicates;
 import nl.javadude.scannit.registry.Registry;
 
 import static nl.javadude.scannit.metadata.DescriptorHelper.toTypeDescriptor;
@@ -47,14 +46,15 @@ public class SubTypeScanner extends AbstractScanner {
     protected void doScan(ClassFile file, Registry registry) {
         String superclass = file.getSuperclass();
         if (accepts(superclass)) {
-            registry.get(this).put(superclass, toTypeDescriptor(file));
+            addToRegistry(registry, superclass, toTypeDescriptor(file));
         }
 
         for (String intf : file.getInterfaces()) {
             if (accepts(intf)) {
-                registry.get(this).put(intf, toTypeDescriptor(file));
+                addToRegistry(registry, intf, toTypeDescriptor(file));
             }
         }
     }
+
 }
 

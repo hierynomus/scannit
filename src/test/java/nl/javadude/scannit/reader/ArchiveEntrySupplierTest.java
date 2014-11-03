@@ -17,19 +17,17 @@
 
 package nl.javadude.scannit.reader;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import de.schlichtherle.truezip.file.TFile;
+import nl.javadude.scannit.predicates.Predicate;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Lists.transform;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.endsWith;
@@ -55,13 +53,17 @@ public class ArchiveEntrySupplierTest {
 	    TestArchiveEntrySupplier archiveEntrySupplier = new TestArchiveEntrySupplier(resource.toURI());
 	    List<TFile> tFiles = archiveEntrySupplier.getTFiles();
         assertThat(tFiles.size(), is(2));
-        assertThat(transform(tFiles, new Function<TFile, String>() {
-            public String apply(TFile input) {
-                return input.getPath();
-            }
-        }), hasItem(endsWith("Empty.java")));
+		assertThat(toPaths(tFiles), hasItem(endsWith("Empty.java")));
 	    archiveEntrySupplier.doCloseForTest();
     }
+
+	private List<String> toPaths(List<TFile> tFiles) {
+		List<String> l = new ArrayList<String>();
+		for (TFile tFile : tFiles) {
+			l.add(tFile.getPath());
+		}
+		return l;
+	}
 
 	@Test
 	public void shouldScanInJarFileAsUriScheme() throws IOException, URISyntaxException {
@@ -94,11 +96,7 @@ public class ArchiveEntrySupplierTest {
         assertThat(resource, notNullValue());
 	    TestArchiveEntrySupplier archiveEntrySupplier = new TestArchiveEntrySupplier(resource.toURI());
 	    List<TFile> tFiles = archiveEntrySupplier.getTFiles();
-        List<String> paths = transform(tFiles, new Function<TFile, String>() {
-            public String apply(TFile input) {
-                return input.getPath();
-            }
-        });
+        List<String> paths = toPaths(tFiles);
         assertThat(paths, not(hasItem(endsWith("Empty.java"))));
         assertThat(paths, hasItem(endsWith("foo.properties")));
         assertThat(tFiles.size(), is(1));
@@ -118,7 +116,7 @@ public class ArchiveEntrySupplierTest {
 		}
 
 		List<TFile> getTFiles() {
-			final List<TFile> files = newArrayList();
+			final List<TFile> files = new ArrayList<TFile>();
 			super.withArchiveEntries(new Predicate<TFile>() {
 				public boolean apply(TFile input) {
 					files.add(input);

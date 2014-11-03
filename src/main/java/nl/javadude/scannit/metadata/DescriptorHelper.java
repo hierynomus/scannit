@@ -17,27 +17,24 @@
 
 package nl.javadude.scannit.metadata;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.List;
-
 import javassist.bytecode.ClassFile;
 import javassist.bytecode.Descriptor;
 import javassist.bytecode.FieldInfo;
 import javassist.bytecode.MethodInfo;
 
-import static com.google.common.collect.Lists.newArrayList;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Arrays;
 
 /**
  * Helper that converts Java Classes, Fields and Methods to/from a String representation.
  */
 public class DescriptorHelper {
 
-    private static List<String> primitiveNames = newArrayList("boolean", "byte", "char", "short", "int", "long", "float", "double");
-    private static List<String> primitiveDescriptors = newArrayList("Z", "B", "C", "S", "I", "J", "F", "D");
+    private static String[] primitiveNames = new String[]{"boolean", "byte", "char", "short", "int", "long", "float", "double"};
+    private static String[] primitiveDescriptors = new String[]{"Z", "B", "C", "S", "I", "J", "F", "D"};
     @SuppressWarnings({"unchecked"})
-    private static List<? extends Class<?>> primitiveClasses = newArrayList(boolean.class, byte.class, char.class, short.class, int.class, long.class, float.class, double.class);
+    private static Class<?>[] primitiveClasses = new Class[]{boolean.class, byte.class, char.class, short.class, int.class, long.class, float.class, double.class};
 
     /**
      * Convert the Javassist ClassFile to a String representation.
@@ -110,6 +107,16 @@ public class DescriptorHelper {
         }
     }
 
+    private static int findInPrimitiveNames(String n) {
+        for (int i = 0; i < primitiveNames.length; i++) {
+            String primitiveName = primitiveNames[i];
+            if (primitiveName.equals(n)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     private static Class<?>[] parameters(String parameters) {
         if (parameters == null || parameters.isEmpty()) return new Class[0];
 
@@ -118,13 +125,13 @@ public class DescriptorHelper {
         for (int i = 0; i < paramDescriptors.length; i++) {
             String paramDescriptor = paramDescriptors[i];
             if (isPrimitive(paramDescriptor)) {
-                clazzes[i] = primitiveClasses.get(primitiveNames.indexOf(paramDescriptor));
+                clazzes[i] = primitiveClasses[findInPrimitiveNames(paramDescriptor)];
             } else {
                 String type = paramDescriptor;
                 if (isArray(paramDescriptor)) {
                     String arrayType = paramDescriptor.substring(0, paramDescriptor.indexOf('['));
                     if (isPrimitive(arrayType)) {
-                        type = "[" + primitiveDescriptors.get(primitiveNames.indexOf(arrayType));
+                        type = "[" + primitiveDescriptors[findInPrimitiveNames(arrayType)];
                     } else {
                         type = "[L" + arrayType + ";";
                     }
@@ -144,7 +151,7 @@ public class DescriptorHelper {
     }
 
     private static boolean isPrimitive(String paramDescriptor) {
-        return primitiveNames.contains(paramDescriptor);
+        return findInPrimitiveNames(paramDescriptor) != -1;
     }
 
     /**

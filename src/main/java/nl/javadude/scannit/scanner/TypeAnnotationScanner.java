@@ -39,7 +39,7 @@ public class TypeAnnotationScanner extends AbstractScanner {
         List<String> typeAnnotations = getTypeAnnotations(file);
 
         for (String typeAnnotation : typeAnnotations) {
-            registry.get(this).put(typeAnnotation, toTypeDescriptor(file));
+            addToRegistry(registry, typeAnnotation, toTypeDescriptor(file));
         }
     }
 }

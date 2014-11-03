@@ -17,8 +17,6 @@
 
 package nl.javadude.scannit.metadata;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
 import javassist.bytecode.ClassFile;
 import javassist.bytecode.FieldInfo;
 import javassist.bytecode.MethodInfo;
@@ -58,11 +56,12 @@ public class DescriptorHelperTest {
     @Test
     public void shouldConvertFieldToDescriptor() {
         List<FieldInfo> fields = classFile.getFields();
-        FieldInfo foo = Collections2.filter(fields, new Predicate<FieldInfo>() {
-            public boolean apply(FieldInfo input) {
-                return input.getName().equals("foo");
+        FieldInfo foo = null;
+        for (FieldInfo field : fields) {
+            if (field.getName().equals("foo")) {
+                foo = field;
             }
-        }).iterator().next();
+        }
 
         assertThat(tofieldDescriptor(classFile, foo), equalTo(fullTestName + ".foo"));
     }

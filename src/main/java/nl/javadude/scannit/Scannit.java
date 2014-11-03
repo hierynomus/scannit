@@ -17,23 +17,21 @@
 
 package nl.javadude.scannit;
 
+import nl.javadude.scannit.registry.Registry;
+import nl.javadude.scannit.registry.RegistryHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.util.concurrent.Monitor;
-
-import nl.javadude.scannit.registry.Registry;
-import nl.javadude.scannit.registry.RegistryHelper;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Scannit {
     private static final AtomicReference<Scannit> REF = new AtomicReference<Scannit>();
-    private static final Monitor M = new Monitor();
+    private static final ReentrantLock LOCK = new ReentrantLock();
 
     final Registry registry = new Registry();
     private RegistryHelper registryHelper;
@@ -49,8 +47,8 @@ public class Scannit {
     }
 
     public static Scannit boot(Configuration configuration, boolean force) {
+        LOCK.lock();
         try {
-            M.enter();
             if (force || !isBooted()) {
                 REF.set(new Scannit(configuration));
             } else {
@@ -58,7 +56,7 @@ public class Scannit {
             }
             return REF.get();
         } finally {
-            M.leave();
+            LOCK.unlock();
         }
     }
 
@@ -67,23 +65,23 @@ public class Scannit {
     }
 
     public static void setInstance(Scannit scannit) {
+        LOCK.lock();
         try {
-            M.enter();
             REF.set(scannit);
         } finally {
-            M.leave();
+            LOCK.unlock();
         }
     }
 
     public static Scannit getInstance() {
+        LOCK.lock();
         try {
-            M.enter();
             if (REF.get() != null) {
                 return REF.get();
             }
             throw new IllegalStateException("Scannit not set via setInstance(Scannit) or boot(Configuration)");
         } finally {
-            M.leave();
+            LOCK.unlock();
         }
     }
 

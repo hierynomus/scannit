@@ -17,13 +17,13 @@
 
 package nl.javadude.scannit.reader;
 
-import com.google.common.collect.Sets;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.Test;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -95,7 +95,7 @@ public class ClasspathReaderTest {
         @Override
         public Set<URI> findURIs(String packagePrefix) {
             try {
-                return Sets.newHashSet(new URI(uri));
+                return Collections.singleton(new URI(uri));
             } catch (URISyntaxException e) {
                 throw new RuntimeException(e);
             }

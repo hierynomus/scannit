@@ -17,24 +17,21 @@
 
 package nl.javadude.scannit;
 
-import java.util.Collection;
-import java.util.Set;
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-
+import nl.javadude.scannit.predicates.Predicate;
+import nl.javadude.scannit.predicates.Predicates;
 import nl.javadude.scannit.scanner.AbstractScanner;
 
-import static com.google.common.base.Predicates.or;
-import static com.google.common.collect.Collections2.transform;
-import static com.google.common.collect.Sets.newHashSet;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A Scannit Configuration object.
  */
 public class Configuration {
-    Set<AbstractScanner> scanners = newHashSet();
-    Set<String> prefixes = newHashSet();
+    Set<AbstractScanner> scanners = new HashSet<AbstractScanner>();
+    Set<String> prefixes = new HashSet<String>();
 
     /**
      * private constructor, use the factory
@@ -80,12 +77,12 @@ public class Configuration {
      * It creates the filter expression for the scanners based on which they decide which classes to include.
      */
     void wireScanners() {
-        Collection<Predicate<CharSequence>> predicates = transform(prefixes, new Function<String, Predicate<CharSequence>>() {
-            public Predicate<CharSequence> apply(String input) {
-                return toFilter(input);
-            }
-        });
-        Predicate<CharSequence> or = or(predicates);
+        Collection<Predicate<CharSequence>> predicates = new ArrayList<Predicate<CharSequence>>();
+        for (String prefix : prefixes) {
+            predicates.add(toFilter(prefix));
+        }
+
+        Predicate<CharSequence> or = Predicates.or(predicates);
 
         for (AbstractScanner scanner : scanners) {
             scanner.addFilter(or);

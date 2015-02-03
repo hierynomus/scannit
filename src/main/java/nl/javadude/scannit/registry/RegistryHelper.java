@@ -42,7 +42,12 @@ public class RegistryHelper {
     }
 
     public Set<Class<?>> getTypesAnnotatedWith(Class<? extends Annotation> annotation, boolean findInheritors) {
-        Set<String> strings = new HashSet<String>(registry.get(TypeAnnotationScanner.class).get(annotation.getName()));
+        Set<String> annotated = registry.get(TypeAnnotationScanner.class).get(annotation.getName());
+        if(annotated == null) {
+            return Collections.emptySet();
+        }
+
+        Set<String> strings = new HashSet<String>(annotated);
         if (findInheritors && annotation.isAnnotationPresent(Inherited.class)) {
             Set<String> moreStrings = new HashSet<String>();
             findSubtypes(strings, moreStrings);

@@ -23,6 +23,8 @@ import nl.javadude.scannit.metadata.JavassistHelper;
 import java.io.IOException;
 import java.io.InputStream;
 
+import static nl.javadude.scannit.metadata.JavassistHelper.closeQuietly;
+
 public class TestUtils {
     public static InputStream getStreamFromClass(Class<?> aClass) {
         return Thread.currentThread().getContextClassLoader().getResourceAsStream(aClass.getName().replaceAll("\\.", "/") + ".class");
@@ -30,7 +32,11 @@ public class TestUtils {
 
     public static ClassFile readClass(Class<?> aClass) throws IOException {
         InputStream resourceAsStream = getStreamFromClass(aClass);
-        return JavassistHelper.readFromInputStream(resourceAsStream);
+        try {
+            return JavassistHelper.readFromInputStream(resourceAsStream);
+        } finally {
+            closeQuietly(resourceAsStream);
+        }
     }
 
 

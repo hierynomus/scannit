@@ -33,7 +33,7 @@ import static nl.javadude.scannit.TestUtils.readClass;
 import static nl.javadude.scannit.metadata.DescriptorHelper.*;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class DescriptorHelperTest {
 

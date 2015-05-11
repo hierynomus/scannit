@@ -1,7 +1,5 @@
 package nl.javadude.scannit.predicates;
 
-import sun.dc.pr.PRError;
-
 import java.util.Collection;
 import java.util.regex.Pattern;
 

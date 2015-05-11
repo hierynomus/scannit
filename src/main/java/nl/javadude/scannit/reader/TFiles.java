@@ -1,6 +1,8 @@
 package nl.javadude.scannit.reader;
 
 import java.net.URI;
+
+import de.schlichtherle.truezip.file.TVFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +27,7 @@ final class TFiles {
     public static void umountQuietly(TFile tFile) {
         try {
             if (tFile.isArchive() && tFile.getEnclArchive() == null) {
-                TFile.umount(tFile);
+                TVFS.umount(tFile);
             }
         } catch (FsSyncException e) {
             logger.error("Could not umount {}, continuing", tFile);

@@ -11,21 +11,21 @@ repositories {
 	mavenCentral()
 }
 
-project.ext.trueZipVersion="7.3.4"
+project.ext.trueZipVersion="7.7.8"
 
 configurations {
 }
 
 dependencies {
-	compile "org.javassist:javassist:3.15.0-GA"
-	compile "org.slf4j:slf4j-api:1.6.3"
+	compile "org.javassist:javassist:3.17.1-GA"
+	compile "org.slf4j:slf4j-api:1.7.12"
 	compile "de.schlichtherle.truezip:truezip-kernel:${trueZipVersion}"
 	compile "de.schlichtherle.truezip:truezip-file:${trueZipVersion}"
 	compile "de.schlichtherle.truezip:truezip-driver-zip:${trueZipVersion}"
-	testCompile "junit:junit:4.10"
+	testCompile "junit:junit:4.12"
 	testCompile "org.hamcrest:hamcrest-core:1.3"
 	testCompile "org.hamcrest:hamcrest-library:1.3"
-	testRuntime "ch.qos.logback:logback-classic:0.9.30"
+	testRuntime "ch.qos.logback:logback-classic:1.1.3"
 }
 
 task sourcesJar(type: Jar) {

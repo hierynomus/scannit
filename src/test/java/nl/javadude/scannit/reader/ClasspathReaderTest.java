@@ -23,7 +23,8 @@ import org.junit.Test;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -92,7 +93,7 @@ public class ClasspathReaderTest {
         @Override
         public Set<URI> findURIs(String packagePrefix) {
             try {
-                return Collections.singleton(new URI(uri));
+             	return new HashSet<URI>(Arrays.asList(new URI(uri), new URI(uri + "/")));
             } catch (URISyntaxException e) {
                 throw new RuntimeException(e);
             }

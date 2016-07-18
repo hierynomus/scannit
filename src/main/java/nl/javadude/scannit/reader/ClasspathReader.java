@@ -85,7 +85,11 @@ public class ClasspathReader {
         String path = packagePrefixToPath(prefix);
         for (URI urI : urIs) {
             String schemeSpecificPart = urI.getSchemeSpecificPart();
-            String based = schemeSpecificPart.substring(0, schemeSpecificPart.length() - path.length());
+            int l = path.length();
+            if (schemeSpecificPart.endsWith("/") && !path.endsWith("/")) {
+                l++;
+	        }
+            String based = schemeSpecificPart.substring(0, schemeSpecificPart.length() - l);
             try {
                 result.add(new URI(urI.getScheme(), based, urI.getFragment()));
             } catch (URISyntaxException e) {

@@ -1,11 +1,15 @@
-apply plugin: 'java'
-apply plugin: 'idea'
-apply plugin: 'eclipse'
-apply plugin: 'maven'
-apply plugin: 'signing'
+plugins {
+	id 'java'
+	id 'maven'
+	id 'signing'
+	id 'org.ajoberstar.release-opinion' version '1.5.1'
+}
 
 group = 'nl.javadude.scannit'
-version = '1.4.1-SNAPSHOT'
+
+release {
+  grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
+}
 
 repositories {
 	mavenCentral()
@@ -94,3 +98,4 @@ uploadArchives {
 	}
 }
 
+tasks.release.dependsOn 'build', 'uploadArchives'
